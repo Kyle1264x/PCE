@@ -1,6 +1,7 @@
 package me.davejavu.pce;
 
 import java.io.File;
+import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -102,6 +103,12 @@ public class PalCraftEssentials extends JavaPlugin implements Listener {
 	}
 	
 	public void onDisable() {
+		try {
+			Methods.con.close();
+		} catch (SQLException e) {
+			log.log(Level.SEVERE, "Error closing the connection! Stack trace:");
+			e.printStackTrace();
+		}
 		log.info("[PalCraftEssentials] Version 2 disabled!");
 		reloadConfig();
 		saveConfig();
