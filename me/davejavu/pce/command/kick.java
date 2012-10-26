@@ -27,7 +27,7 @@ public class kick extends PalCommand {
 			if (permissionCheck(sender, "PalCraftEssentials.command.kick")) {
 				if (args.length > 1) {
 					if (args[0].equalsIgnoreCase("list")) {
-						ResultSet r = Methods.getRows(Methods.mysqlConnect(host, port, database, username, password), "player_info");
+						ResultSet r = Methods.getRows(Methods.con, "player_info");
 						boolean isInTable = false;
 						String prevKicks = "";
 						try{
@@ -66,7 +66,7 @@ public class kick extends PalCommand {
 							sendMessage(sender, ChatColor.RED + "You can't kick " + args[0]);
 							return true;
 						} else {
-							ResultSet r = Methods.getRows(Methods.mysqlConnect(host, port, database, username, password), "player_info");
+							ResultSet r = Methods.getRows(Methods.con, "player_info");
 							boolean isInTable = false;
 							String prevKicks = "";
 							try{
@@ -84,11 +84,11 @@ public class kick extends PalCommand {
 							Bukkit.getServer().broadcastMessage(ChatColor.DARK_RED + "[" + ChatColor.RED + sender.getName() + ChatColor.DARK_RED + "] " + ChatColor.RED + "Kicking " + p2.getDisplayName() + ": " + ChatColor.WHITE + reason.toString());
 							prevKicks += kick;
 							if (isInTable) {
-								Methods.editRow(Methods.mysqlConnect(host, port, database, username, password), "player_info", "player='" + args[0] + "'","kicks='" + prevKicks + kick + "'");
+								Methods.editRow(Methods.con, "player_info", "player='" + args[0] + "'","kicks='" + prevKicks + kick + "'");
 								sendMessage(sender, ChatColor.RED + args[0] + " has been kicked " + (prevKicks.split(";").length > 4 ? ChatColor.DARK_RED : "") + prevKicks.split(";").length + ChatColor.RED + " time" + (prevKicks.split(";").length > 1 ? "s" : "") + ".");
 							} else {
 								kick.replace("'", "");
-								Methods.insertInfo(Methods.mysqlConnect(host, port, database, username, password), "player_info", "`player`,`warnings`,`bans`,`kicks`","'" + args[0] + "',' ',' ','" + kick + "'");
+								Methods.insertInfo(Methods.con, "player_info", "`player`,`warnings`,`bans`,`kicks`","'" + args[0] + "',' ',' ','" + kick + "'");
 							}
 							return true;
 						}

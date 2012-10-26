@@ -1,9 +1,3 @@
-/* PalCraftListener.java - davejavu
- * If you use my code, please
- * add my name to the notes.
- * Use whatever, idc.
- */
-
 package me.davejavu.pce;
 
 import java.sql.ResultSet;
@@ -610,7 +604,7 @@ public class PalCraftListener implements Listener {
 		String banreason = " ";
 		//Perma ban
 		boolean banned = false;	
-		ResultSet rpl = Methods.getRows(Methods.mysqlConnect(host, port, database, username, password), "perma_bans");
+		ResultSet rpl = Methods.getRows(Methods.con, "perma_bans");
 			try{
 				while(rpl.next()) {
 					if (player.getName().equalsIgnoreCase(rpl.getString("player"))) {
@@ -628,7 +622,7 @@ public class PalCraftListener implements Listener {
 			int id = -1;
 			boolean b = false;
 			String when = "";
-			ResultSet rtm = Methods.getRows(Methods.mysqlConnect(host, port, database, username, password), "temp_bans");
+			ResultSet rtm = Methods.getRows(Methods.con, "temp_bans");
 			try{
 				while(rtm.next()) {
 					if (player.getName().equalsIgnoreCase(rtm.getString("player"))) {
@@ -650,7 +644,7 @@ public class PalCraftListener implements Listener {
 				
 				
 				if(diff <= 0){
-					Methods.deleteRow(Methods.mysqlConnect(host, port, database, username, password), "temp_bans", id, "player = '" + player.getName().toLowerCase() + "'");
+					Methods.deleteRow(Methods.con, "temp_bans", id, "player = '" + player.getName().toLowerCase() + "'");
 					banreason = " ";
 				}else{
 					banreason = "Temp banned - "+diff/1000/60+" mins: " + banreason;
@@ -707,7 +701,7 @@ public class PalCraftListener implements Listener {
 	
 	public static boolean isTempBanned(OfflinePlayer player) {
 		boolean b = false;
-		ResultSet rtm = Methods.getRows(Methods.mysqlConnect(host, port, database, username, password), "temp_bans");
+		ResultSet rtm = Methods.getRows(Methods.con, "temp_bans");
 		try{
 			while(rtm.next()) {
 				if (player.getName().equalsIgnoreCase(rtm.getString("player"))) {

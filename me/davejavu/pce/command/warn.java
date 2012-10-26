@@ -24,7 +24,7 @@ public class warn extends PalCommand {
 			if (permissionCheck(sender, "command.warn")) {
 				if (args.length > 1) {
 					if (args[0].equalsIgnoreCase("add")) {
-						ResultSet r = Methods.getRows(Methods.mysqlConnect(host, port, database, username, password), "player_info");
+						ResultSet r = Methods.getRows(Methods.con, "player_info");
 						boolean ad = false;
 						String warnings = "";
 						try{
@@ -43,7 +43,7 @@ public class warn extends PalCommand {
 						}
 						if (ad) {
 							String warn = warnings + sender.getName() + " - " +  wn.toString() + ";";
-							Methods.editRow(Methods.mysqlConnect(host, port, database, username, password), "player_info", "warnings='" + warn + "'", "player='" + args[1] + "'");
+							Methods.editRow(Methods.con, "player_info", "warnings='" + warn + "'", "player='" + args[1] + "'");
 							sendMessage(sender, ChatColor.RED + "Warned " + args[1] + ChatColor.DARK_RED + " (" + warn.split(";").length + ")" + ChatColor.RED + ": " + ChatColor.WHITE + wn.toString());
 							if (warn.split(";").length > 4) {
 								String reason = "You have 5 warnings!";
@@ -57,17 +57,17 @@ public class warn extends PalCommand {
 									log.log(Level.SEVERE, "A severe error occured!");
 									
 								}
-								Methods.insertInfo(Methods.mysqlConnect(host, port, database, username, password), "perma_bans", "`id`,`player`,`reason`,`staff`,`date`", id + ",'" + args[1] + "','" + reason + "','" + sender.getName() + "','" + date + "'");
+								Methods.insertInfo(Methods.con, "perma_bans", "`id`,`player`,`reason`,`staff`,`date`", id + ",'" + args[1] + "','" + reason + "','" + sender.getName() + "','" + date + "'");
 							}
 							return true;
 						} else {
 							String rn = wn.toString().replace("'", "").replace(";", "");
-							Methods.insertInfo(Methods.mysqlConnect(host, port, database, username, password), "player_info", "`player`,`warnings`,`bans`,`kicks`", "'" + args[1] + "','" + sender.getName() + " - " +  rn + ";" + "',' ',' '");
+							Methods.insertInfo(Methods.con, "player_info", "`player`,`warnings`,`bans`,`kicks`", "'" + args[1] + "','" + sender.getName() + " - " +  rn + ";" + "',' ',' '");
 							sendMessage(sender, ChatColor.RED + "Warned " + args[1] + ChatColor.DARK_RED + " (1)" + ChatColor.RED + ": " + ChatColor.WHITE + rn);
 							return true;
 						}
 					} else if (args[0].equalsIgnoreCase("list")) {
-						ResultSet r = Methods.getRows(Methods.mysqlConnect(host, port, database, username, password), "player_info");
+						ResultSet r = Methods.getRows(Methods.con, "player_info");
 						boolean ad = false;
 						String wn = "";
 						try{
@@ -93,7 +93,7 @@ public class warn extends PalCommand {
 							return true;
 						}
 					} else if (args[0].equalsIgnoreCase("remove")) {
-						ResultSet r = Methods.getRows(Methods.mysqlConnect(host, port, database, username, password), "player_info");
+						ResultSet r = Methods.getRows(Methods.con, "player_info");
 						boolean ad = false;
 						String wn = "";
 						try{
@@ -108,7 +108,7 @@ public class warn extends PalCommand {
 						}
 						if (ad && !wn.equalsIgnoreCase(" ")) {
 							if (args[2].equalsIgnoreCase("all")) {
-								Methods.editRow(Methods.mysqlConnect(host, port, database, username, password), "player_info", "warnings=' '", "player='" + args[1] + "'");
+								Methods.editRow(Methods.con, "player_info", "warnings=' '", "player='" + args[1] + "'");
 								sendMessage(sender, ChatColor.GOLD + "Removed all warnings from " + ChatColor.WHITE + args[1]);
 								return true;
 							} else {
@@ -126,7 +126,7 @@ public class warn extends PalCommand {
 										nw.append(w[i] + ";");
 									}
 								}
-								Methods.editRow(Methods.mysqlConnect(host, port, database, username, password), "player_info", "warnings='" + nw.toString() + "'", "player='" + args[1] + "'");
+								Methods.editRow(Methods.con, "player_info", "warnings='" + nw.toString() + "'", "player='" + args[1] + "'");
 								sendMessage(sender, ChatColor.GOLD + "Removed warning " + ChatColor.WHITE + id + ChatColor.GOLD + " from " + ChatColor.WHITE + args[1]);
 								return true;
 							}

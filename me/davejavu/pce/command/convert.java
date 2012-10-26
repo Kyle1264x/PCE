@@ -33,7 +33,7 @@ public class convert extends PalCommand {
 		if (cmd.getName().equalsIgnoreCase("convert")) {
 			if (permissionCheck(sender, "command.convert")) {
 				if (args.length == 1) {
-					ResultSet r = Methods.getRows(Methods.mysqlConnect(host, port, database, username, password), "perma_bans");
+					ResultSet r = Methods.getRows(Methods.con, "perma_bans");
 					if (args[0].equalsIgnoreCase("from")) {
 						try {
 							while (r.next()) {
@@ -63,7 +63,7 @@ public class convert extends PalCommand {
 						
 						for (OfflinePlayer p : Bukkit.getServer().getBannedPlayers()) {
 							if (!s.contains(p.getName().toLowerCase())) {
-								Methods.insertInfo(Methods.mysqlConnect(host, port, database, username, password), "perma_bans", "`id`,`player`,`reason`,`staff`,`date`", id + ",'" + p.getName() + "','" + getConfig().getFC().getString("banreason." + p.getName().toLowerCase()) + "','" + getConfig().getFC().getString("whobanned." + p.getName().toLowerCase()) + "','" + date + "'");
+								Methods.insertInfo(Methods.con, "perma_bans", "`id`,`player`,`reason`,`staff`,`date`", id + ",'" + p.getName() + "','" + getConfig().getFC().getString("banreason." + p.getName().toLowerCase()) + "','" + getConfig().getFC().getString("whobanned." + p.getName().toLowerCase()) + "','" + date + "'");
 								id++;
 							}
 						}
@@ -93,7 +93,7 @@ public class convert extends PalCommand {
 								if (lns.length > 0) {
 									if (!s.contains(lns[0])) {
 										Bukkit.getServer().getOfflinePlayer(lns[0]).setBanned(true);
-										Methods.insertInfo(Methods.mysqlConnect(host, port, database, username, password), "perma_bans", "`id`,`player`,`reason`,`staff`,`date`", id + ",'" + lns[0] + "','" + lns[4] + "','" + lns[2] + "','" + lns[1] + "'");
+										Methods.insertInfo(Methods.con, "perma_bans", "`id`,`player`,`reason`,`staff`,`date`", id + ",'" + lns[0] + "','" + lns[4] + "','" + lns[2] + "','" + lns[1] + "'");
 										id++;
 									}
 								}

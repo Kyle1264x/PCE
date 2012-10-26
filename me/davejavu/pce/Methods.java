@@ -1,9 +1,3 @@
-/* Methods.java - davejavu
- * If you use my code, please
- * add my name to the notes.
- * Use whatever, idc.
- */
-
 package me.davejavu.pce;
 
 import java.sql.Connection;
@@ -13,7 +7,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 public class Methods {
-	
+	public static Connection con;
 	//MySQL methods, cba to explain them all.
 	
 	public static Connection mysqlConnect(String host, String port, String database, String username, String password) {

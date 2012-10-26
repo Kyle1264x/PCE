@@ -1,9 +1,3 @@
-/* PalCraftAsyncListener.java - davejavu
- * If you use my code, please
- * add my name to the notes.
- * Use whatever, idc.
- */
-
 package me.davejavu.pce;
 
 import java.sql.ResultSet;
@@ -75,7 +69,7 @@ public class PalCraftAsyncListener implements Listener {
 			}
 			
 			if (ig) {
-				ResultSet r = Methods.getRows(Methods.mysqlConnect(host, port, database, username, password), "troll");
+				ResultSet r = Methods.getRows(Methods.con, "troll");
 				List<String> se = new ArrayList<String>();
 				try{
 					while (r.next()) {

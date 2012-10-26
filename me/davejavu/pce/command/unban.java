@@ -27,7 +27,7 @@ public class unban extends PalCommand {
 				if (args.length == 2) {
 					if (args[0].equalsIgnoreCase("player")) {
 						boolean banned = false;
-						ResultSet ra = Methods.getRows(Methods.mysqlConnect(host, port, database, username, password), "perma_bans");
+						ResultSet ra = Methods.getRows(Methods.con, "perma_bans");
 						
 						int id = -1;
 						try {
@@ -42,7 +42,7 @@ public class unban extends PalCommand {
 						}
 						if (banned) {
 							Bukkit.getServer().getOfflinePlayer(args[1]).setBanned(false);
-							Methods.deleteRow(Methods.mysqlConnect(host, port, database, username, password), "perma_bans", id, "player = '" + args[1] + "'");
+							Methods.deleteRow(Methods.con, "perma_bans", id, "player = '" + args[1] + "'");
 							Bukkit.getServer().broadcastMessage(ChatColor.DARK_RED + "[" + ChatColor.RED + sender.getName() + ChatColor.DARK_RED + "] " + ChatColor.RED + "Unbanning " + args[1]);
 							return true;
 						} else {
@@ -59,7 +59,7 @@ public class unban extends PalCommand {
 						}
 					} else if (args[0].equalsIgnoreCase("ip")) {
 						boolean banned = false;
-						ResultSet r = Methods.getRows(Methods.mysqlConnect(host, port, database, username, password), "ip_bans");
+						ResultSet r = Methods.getRows(Methods.con, "ip_bans");
 						
 						try {
 							while (r.next()) {
@@ -85,7 +85,7 @@ public class unban extends PalCommand {
 								
 							}
 							if (id != -1){
-								Methods.deleteRow(Methods.mysqlConnect(host, port, database, username, password), "ip_bans", id, "ip = '" + args[1] + "'");
+								Methods.deleteRow(Methods.con, "ip_bans", id, "ip = '" + args[1] + "'");
 							}
 							Bukkit.getServer().broadcastMessage(ChatColor.DARK_RED + "[" + ChatColor.RED + sender.getName() + ChatColor.DARK_RED + "] " + ChatColor.RED + "Unbanning " + args[1]);
 						} else {
@@ -94,7 +94,7 @@ public class unban extends PalCommand {
 						}
 					} else if (args[0].equalsIgnoreCase("temp")) {
 						int id = -1;
-						ResultSet r = Methods.getRows(Methods.mysqlConnect(host, port, database, username, password), "temp_bans");
+						ResultSet r = Methods.getRows(Methods.con, "temp_bans");
 						
 						try {
 							while (r.next()) {
@@ -106,7 +106,7 @@ public class unban extends PalCommand {
 							
 						}
 						if (id != -1) {
-							Methods.deleteRow(Methods.mysqlConnect(host, port, database, username, password), "temp_bans", id, "player = '" + args[1] + "'");
+							Methods.deleteRow(Methods.con, "temp_bans", id, "player = '" + args[1] + "'");
 							Bukkit.getServer().broadcastMessage(ChatColor.DARK_RED + "[" + ChatColor.RED + sender.getName() + ChatColor.DARK_RED + "] " + ChatColor.RED + "Un temp-banning " + args[1]);
 							return true;
 						} else {
