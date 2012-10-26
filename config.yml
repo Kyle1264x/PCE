@@ -1,0 +1,9 @@
+local:
+mysql:
+  host: "enter host"
+  port: 3306
+  database: 'db_name'
+  username: 'username'
+  password: 'password'
+players:
+chat-format: '{PREFIX} {NAME} {SUFFIX}&7: &f'
