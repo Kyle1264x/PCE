@@ -1,3 +1,9 @@
+/* PalCraftListener.java - davejavu
+ * If you use my code, please
+ * add my name to the notes.
+ * Use whatever, idc.
+ */
+
 package me.davejavu.pce;
 
 import java.sql.ResultSet;
@@ -462,16 +468,24 @@ public class PalCraftListener implements Listener {
 		CustomConfig pC = PalCommand.getConfig(player);
 		FileConfiguration fc = pC.getFC();
 		if (fc.getBoolean("freeze.boolean")) {
-			long a1 = fc.getLong("freeze.time");
-			long diff = fc.getLong("freeze.time") - System.currentTimeMillis();
-			if(diff <= 0 && a1 != 0){
-				fc.set("freeze.boolean", false);
-				pC.save();
-			} else {
-				player.sendMessage(ChatColor.RED + "Frozen for "+diff/1000/60+" more minutes!");
+			String a1 = fc.getString("freeze.time");
+			if (a1.equalsIgnoreCase("forever")) {
+				player.sendMessage(ChatColor.RED + "Frozen!");
 				Location back = new Location(evt.getFrom().getWorld(), evt.getFrom().getX(), evt.getFrom().getY(), evt.getFrom().getZ());
 				player.teleport(back);
+			} else {
+				long diff = fc.getLong("freeze.time") - System.currentTimeMillis();
+				long a2 = Long.parseLong(a1);
+				if(diff <= 0 && a2 != 0){
+					fc.set("freeze.boolean", false);
+					pC.save();
+				} else {
+					player.sendMessage(ChatColor.RED + "Frozen for "+diff/1000/60+" more minutes!");
+					Location back = new Location(evt.getFrom().getWorld(), evt.getFrom().getX(), evt.getFrom().getY(), evt.getFrom().getZ());
+					player.teleport(back);
+				}
 			}
+			
 		}
 		if (player.isFlying()) {
 			int x = (int) player.getLocation().getX();
@@ -574,50 +588,24 @@ public class PalCraftListener implements Listener {
 		CustomConfig conf = PalCommand.getConfig(player);
 		FileConfiguration fc = conf.getFC();
 		if (fc.getBoolean("block-commands.boolean")) {
-			long diff = fc.getLong("block-commands.time") - System.currentTimeMillis();
-			if(diff <= 0){
-				fc.set("block-commands.boolean", false);
-				conf.save();
-			} else {
-				player.sendMessage(ChatColor.RED + "Cmds blocked for "+diff/1000/60+" more minutes!");
+			String f = fc.getString("block-commands.time");
+			if (f.equalsIgnoreCase("forever")) {
+				player.sendMessage(ChatColor.RED + "Cmds blocked!");
 				evt.setCancelled(true);
+			} else {
+				long diff = Long.parseLong(f) - System.currentTimeMillis();
+				if(diff <= 0){
+					fc.set("block-commands.boolean", false);
+					conf.save();
+				} else {
+					player.sendMessage(ChatColor.RED + "Cmds blocked for "+diff/1000/60+" more minutes!");
+					evt.setCancelled(true);
+				}
 			}
+			
 		}
 		
 	}
-	
-	/*@EventHandler
-	public void onCommandPreProcess(PlayerCommandPreprocessEvent evt) {
-		String totalMessage = evt.getMessage();
-		String cmd = totalMessage;
-		if (totalMessage.contains(" ")) {
-			cmd = totalMessage.split(" ")[0];
-		}
-		if (cmd.charAt(0) == '/') {
-			cmd = cmd.replaceFirst("/", "");
-		}
-		boolean contains = false;
-		for (String p : cmds) {
-			if (cmd.equalsIgnoreCase(p))
-				contains = true;
-		}
-		if (cmd.equalsIgnoreCase("plugins")) {
-			evt.getPlayer().sendMessage("Plugins (1): " + ChatColor.GREEN + "Your brain will not understand the magic that is this server.");
-			evt.setCancelled(true);
-			contains = false;
-		}
-		if ((Bukkit.getServer().getPluginCommand(cmd) == null) && (contains)) {
-			evt.setCancelled(true);
-			evt.getPlayer().sendMessage("I don't understand '" + cmd + "'");
-		}
-	}*/
-	
-	
-	
-	
-	
-	
-	
 	public static String isBanned(OfflinePlayer player) {
 		String banreason = " ";
 		//Perma ban

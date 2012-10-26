@@ -1,3 +1,9 @@
+/* blockcmd.java - davejavu
+ * If you use my code, please
+ * add my name to the notes.
+ * Use whatever, idc.
+ */
+
 package me.davejavu.pce.command;
 
 import org.bukkit.ChatColor;
@@ -25,15 +31,14 @@ public class blockcmd extends PalCommand {
 					CustomConfig conf = getConfig(player);
 					if (conf.getFC().getBoolean("block-commands.boolean") == true) {
 						conf.getFC().set("block-commands.boolean", false);
-						conf.getFC().set("block-commands.time", 0L);
+						conf.getFC().set("block-commands.time", "off");
 					} else {
-						long tempTime = PalCraftListener.parseTimeSpec("2","min");
 						conf.getFC().set("block-commands.boolean", true);
-						conf.getFC().set("block-commands.time", tempTime);
+						conf.getFC().set("block-commands.time", "forever");
 					}
 					if (args.length > 1) {
 						long tempTime = PalCraftListener.parseTimeSpec(args[1],args[2]);
-						conf.getFC().set("block-commands.time", tempTime);
+						conf.getFC().set("block-commands.time", tempTime + "");
 					}
 					conf.save();
 					sendMessage(sender, ChatColor.GOLD + "Command block for " + ChatColor.WHITE + player.getDisplayName() + ": " + (conf.getFC().getBoolean("block-commands.boolean") ? ChatColor.GREEN + "Enabled" : ChatColor.RED + "Disabled") + (args.length > 1 ? ChatColor.GOLD + " for " + ChatColor.WHITE + args[1] + " " + args[2] : ""));

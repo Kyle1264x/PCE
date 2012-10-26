@@ -1,3 +1,9 @@
+/* ban.java - davejavu
+ * If you use my code, please
+ * add my name to the notes.
+ * Use whatever, idc.
+ */
+
 package me.davejavu.pce.command;
 
 import java.sql.ResultSet;
