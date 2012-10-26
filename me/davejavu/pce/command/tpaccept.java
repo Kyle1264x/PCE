@@ -42,7 +42,7 @@ public class tpaccept extends PalCommand {
 								((Player)sender).teleport(p.getPlayer());
 								sendMessage(sender, ChatColor.GREEN + "Accepted " + ChatColor.GOLD + "teleport request from " + ChatColor.WHITE + p.getPlayer().getDisplayName());
 								PalCraftEssentials.tpa.remove(((Player)sender).getName().toLowerCase());
-								Bukkit.getPlayer(tpTo).sendMessage(ChatColor.GOLD + p.getPlayer().getDisplayName() + ChatColor.GREEN + " accepted " + ChatColor.GOLD + "your teleport request");
+								Bukkit.getPlayer(tpTo).sendMessage(ChatColor.GOLD + ((Player)sender).getDisplayName() + ChatColor.GREEN + " accepted " + ChatColor.GOLD + "your teleport request");
 								return true;
 							} else {
 								sendMessage(sender, ChatColor.RED + "Noone to accept a tp from!");

@@ -42,6 +42,7 @@ public class CustomConfig {
 		fileConfig = YamlConfiguration.loadConfiguration(file);
 	}
 	
+	//Returns the FileConfiguration, so you can add/change stuff in the config
 	public FileConfiguration getFC() {
 		return fileConfig;
 	}
@@ -52,7 +53,7 @@ public class CustomConfig {
 			e.printStackTrace();
 		}
 	}
-	
+	//Saves, simple
 	public void save() {
 		try {
 			fileConfig.save(fileConfigFile);
@@ -60,7 +61,7 @@ public class CustomConfig {
 			e.printStackTrace();
 		}
 	}
-	
+	//Returns ALL player configs.
 	public static List<String> listPlayerConfigs() {
 		List<String> ret = new ArrayList<String>();
 		File dir = new File("./plugins/PalCraftEssentials/players");

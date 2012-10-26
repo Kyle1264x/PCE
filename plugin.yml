@@ -26,8 +26,6 @@ permissions:
             PalCraftEssentials.command.heal: true
             PalCraftEssentials.command.heal.others: true
             PalCraftEssentials.command.home: true
-            PalCraftEssentials.command.info.self: true
-            PalCraftEssentials.command.info.others: true
             PalCraftEssentials.command.item: true
             PalCraftEssentials.command.kick: true
             PalCraftEssentials.command.kickall: true
@@ -35,6 +33,8 @@ permissions:
             PalCraftEssentials.command.msg: true
             PalCraftEssentials.command.msg.colours: true
             PalCraftEssentials.command.mute: true
+            PalCraftEssentials.command.playtime.self: true
+            PalCraftEssentials.command.playtime.others: true
             PalCraftEssentials.command.repair: true
             PalCraftEssentials.command.serverinfo: true
             PalCraftEssentials.command.sethome: true
@@ -116,10 +116,6 @@ permissions:
         default: op
     PalCraftEssentials.command.home:
         default: true
-    PalCraftEssentials.command.info.self:
-        default: op
-    PalCraftEssentials.command.info.others:
-        default: op
     PalCraftEssentials.command.item:
         default: op
     PalCraftEssentials.command.kick:
@@ -133,6 +129,10 @@ permissions:
     PalCraftEssentials.command.msg.colours:
         default: true
     PalCraftEssentials.command.mute:
+        default: op
+    PalCraftEssentials.command.playtime.self:
+        default: op
+    PalCraftEssentials.command.playtime.others:
         default: op
     PalCraftEssentials.command.repair:
         default: op
@@ -271,6 +271,8 @@ commands:
     aliases: [tell,message,m,tell,t,pmsg]
   mute:
     description: Mute a player
+  playtime:
+    description: See playtime.
   pvp:
     description: Toggle PVP
   repair:

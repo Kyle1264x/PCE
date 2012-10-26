@@ -13,6 +13,11 @@ import org.bukkit.entity.Player;
 
 public abstract class PalCommand implements CommandExecutor {
 	public abstract boolean onCommand(CommandSender sender, Command cmd, String cmdLabel, String[] args);
+	
+	
+	
+	//Stuff that command classes can use, means I don't have to change them all if I get it wrong, I just have to change these methods.
+	
 	public static void sendMessage(CommandSender sender, String message) {
 		if (sender instanceof Player) {
 			Player p = (Player) sender;
@@ -60,6 +65,7 @@ public abstract class PalCommand implements CommandExecutor {
 	public static String password = getConfig().getFC().getString("mysql.password");
 	public static Logger log = Logger.getLogger("Minecraft");
 	public static String date = PalCraftEssentials.date;
+	
 	public static CustomConfig getConfig() {
 		return new CustomConfig("./plugins/PalCraftEssentials", "config.yml");
 	}

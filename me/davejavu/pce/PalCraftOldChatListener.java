@@ -23,6 +23,8 @@ import org.bukkit.plugin.Plugin;
 
 @SuppressWarnings("deprecation")
 public class PalCraftOldChatListener implements Listener {
+	//Old chat listener, won't be updated.
+	
 	Plugin plugin;
 	public PalCraftOldChatListener(PalCraftEssentials plugin) {
 		this.plugin = plugin;
@@ -104,19 +106,21 @@ public class PalCraftOldChatListener implements Listener {
 		if (PalCommand.permissionCheck((CommandSender)player,"PalCraftEssentials.chat.colours")) {
 			message = message.replaceAll("&([0-9a-rA-R])", "§$1");
 		}
-		GroupManager gm = (GroupManager) Bukkit.getPluginManager().getPlugin("GroupManager");
-		if (gm != null) {
-			AnjoPermissionsHandler handler = gm.getWorldsHolder().getWorldPermissions(player);
-			if (handler == null) {
-				PalCraftEssentials.log.log(Level.SEVERE, "Handler == null!");
+		if (Bukkit.getPluginManager().isPluginEnabled("GroupManager")) {
+			GroupManager gm = (GroupManager) Bukkit.getPluginManager().getPlugin("GroupManager");
+			if (gm != null) {
+				AnjoPermissionsHandler handler = gm.getWorldsHolder().getWorldPermissions(player);
+				if (handler == null) {
+					PalCraftEssentials.log.log(Level.SEVERE, "Handler == null!");
+				} else {
+					String gmPrefix = handler.getUserPrefix(player.getName()).replaceAll("&([0-9a-rA-R])", "§$1");
+					String gmSuffix = handler.getUserSuffix(player.getName()).replaceAll("&([0-9a-rA-R])", "§$1");
+					String fm = "%s%s%s" + ChatColor.GRAY + ": " + ChatColor.WHITE + "%s";
+					evt.setFormat(String.format(fm, gmPrefix, name, gmSuffix, ChatColor.WHITE + message));
+				}
 			} else {
-				String gmPrefix = handler.getUserPrefix(player.getName()).replaceAll("&([0-9a-rA-R])", "§$1");
-				String gmSuffix = handler.getUserSuffix(player.getName()).replaceAll("&([0-9a-rA-R])", "§$1");
-				String fm = "%s%s%s" + ChatColor.GRAY + ": " + ChatColor.WHITE + "%s";
-				evt.setFormat(String.format(fm, gmPrefix, name, gmSuffix, ChatColor.WHITE + message));
+				PalCraftEssentials.log.log(Level.SEVERE, "GM == null!");
 			}
-		} else {
-			PalCraftEssentials.log.log(Level.SEVERE, "GM == null!");
 		}
 	}
 	

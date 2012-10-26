@@ -22,6 +22,8 @@ import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.plugin.Plugin;
 
 public class PalCraftAsyncListener implements Listener {
+	//Listener for Bukkit newer than 1.2.5
+	
 	Plugin plugin;
 	public PalCraftAsyncListener(PalCraftEssentials plugin) {
 		this.plugin = plugin;
@@ -35,7 +37,7 @@ public class PalCraftAsyncListener implements Listener {
 	public static String date = PalCraftEssentials.date;
 	
 	@EventHandler
-	public void onPlayerChat(AsyncPlayerChatEvent evt) {
+	public static void onPlayerChat(AsyncPlayerChatEvent evt) {
 		Player player = evt.getPlayer();
 		String name = player.getDisplayName();
 		String message = evt.getMessage();
@@ -103,20 +105,21 @@ public class PalCraftAsyncListener implements Listener {
 		if (PalCommand.permissionCheck((CommandSender)player,"PalCraftEssentials.chat.colours")) {
 			message = message.replaceAll("&([0-9a-rA-R])", "§$1");
 		}
-		GroupManager gm = (GroupManager) Bukkit.getPluginManager().getPlugin("GroupManager");
-		if (gm != null) {
-			AnjoPermissionsHandler handler = gm.getWorldsHolder().getWorldPermissions(player);
-			if (handler == null) {
-				PalCraftEssentials.log.log(Level.SEVERE, "Handler == null!");
+		if (Bukkit.getPluginManager().isPluginEnabled("GroupManager")) {
+			GroupManager gm = (GroupManager) Bukkit.getPluginManager().getPlugin("GroupManager");
+			if (gm != null) {
+				AnjoPermissionsHandler handler = gm.getWorldsHolder().getWorldPermissions(player);
+				if (handler == null) {
+					PalCraftEssentials.log.log(Level.SEVERE, "Handler == null!");
+				} else {
+					String gmPrefix = handler.getUserPrefix(player.getName()).replaceAll("&([0-9a-rA-R])", "§$1");
+					String gmSuffix = handler.getUserSuffix(player.getName()).replaceAll("&([0-9a-rA-R])", "§$1");
+					String fm = "%s%s%s" + ChatColor.GRAY + ": " + ChatColor.WHITE + "%s";
+					evt.setFormat(String.format(fm, gmPrefix, name, gmSuffix, ChatColor.WHITE + message));
+				}
 			} else {
-				String gmPrefix = handler.getUserPrefix(player.getName()).replaceAll("&([0-9a-rA-R])", "§$1");
-				String gmSuffix = handler.getUserSuffix(player.getName()).replaceAll("&([0-9a-rA-R])", "§$1");
-				String fm = "%s%s%s" + ChatColor.GRAY + ": " + ChatColor.WHITE + "%s";
-				evt.setFormat(String.format(fm, gmPrefix, name, gmSuffix, ChatColor.WHITE + message));
+				PalCraftEssentials.log.log(Level.SEVERE, "GM == null!");
 			}
-		} else {
-			PalCraftEssentials.log.log(Level.SEVERE, "GM == null!");
 		}
 	}
-	
 }

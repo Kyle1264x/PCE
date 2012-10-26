@@ -65,7 +65,6 @@ public class PalCraftListener implements Listener {
 	
 	public static boolean ultramute = false;
 	
-	public static String[] cmds;
 	public static String[] commands;
 	
 	public static List<String> moo = new ArrayList<String>();
@@ -492,6 +491,8 @@ public class PalCraftListener implements Listener {
 		//play.remove(player.getName().toLowerCase());
 		//plugin.getConfig().set("playtime." + player.getName().toLowerCase(), plugin.getConfig().getLong("platime." + player.getName().toLowerCase()) + (System.currentTimeMillis() - l));
 		//plugin.saveConfig();
+		
+		updatePlaytime(player);
 		online.remove(player.getName());
 		if (kick.containsKey(player.getName().toLowerCase())) {
 			kick.remove(player.getName().toLowerCase());
@@ -799,5 +800,16 @@ public class PalCraftListener implements Listener {
 	}
 	public static String getRandomPlayer() {
 		return Bukkit.getOnlinePlayers()[new Random().nextInt(Bukkit.getOnlinePlayers().length - 1)].getDisplayName();
+	}
+	public static void updatePlaytime(Player player) {
+		CustomConfig conf = PalCommand.getConfig(player);
+		long l = play.get(player.getName().toLowerCase());
+		long pl = System.currentTimeMillis() - l;
+		long oldPlay = conf.getFC().getLong("playtime");
+		long newPlay = oldPlay + pl;
+		conf.getFC().set("playtime", newPlay);
+		conf.save();
+		play.remove(player.getName().toLowerCase());
+		play.put(player.getName().toLowerCase(), System.currentTimeMillis());
 	}
 }

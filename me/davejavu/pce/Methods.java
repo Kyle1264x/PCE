@@ -8,6 +8,8 @@ import java.sql.Statement;
 
 public class Methods {
 	
+	//MySQL methods, cba to explain them all.
+	
 	public static Connection mysqlConnect(String host, String port, String database, String username, String password) {
 		Connection con = null;
 		try{
