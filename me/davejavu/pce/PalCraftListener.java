@@ -119,10 +119,16 @@ public class PalCraftListener implements Listener {
 				evt.setKickMessage("A MySQL error occurred - try again later.");
 				e.printStackTrace();
 			}
-			if (!br.equalsIgnoreCase(" ")) {
+			if (br != null) {
+				if (!br.equalsIgnoreCase(" ")) {
+					evt.setResult(Result.KICK_BANNED);
+					evt.setKickMessage(br);
+				}
+			} else {
 				evt.setResult(Result.KICK_BANNED);
-				evt.setKickMessage(br);
+				evt.setKickMessage("A MySQL error occurred - try again later.");
 			}
+			
 		} else {
 			player.sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "You were banned! (You are exempt)");
 		}
@@ -401,7 +407,13 @@ public class PalCraftListener implements Listener {
 			}
 			
 		}
-		List<OfflinePlayer> vanList = vanish.listVanished();
+		List<String> vanList = vanish.listOnlineVanished();
+		if (!player.hasPermission("PalCraftEssentials.command.vanish")) {
+			for (String s : vanList) {
+				Player p = Bukkit.getPlayer(s);
+				player.hidePlayer(p);
+			}
+		}
 		for (Player p : Bukkit.getOnlinePlayers()) {
 			if (vanList.contains(Bukkit.getOfflinePlayer(p.getName()))) {
 				player.hidePlayer(p);

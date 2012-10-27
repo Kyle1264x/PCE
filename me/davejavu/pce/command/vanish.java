@@ -120,6 +120,15 @@ public class vanish extends PalCommand {
 			}
 		}
 	}
+	public static List<String> listOnlineVanished() {
+		List<String> v = new ArrayList<String>();
+		for (OfflinePlayer p : listVanished()) {
+			if (p.isOnline()) {
+				v.add(p.getName());
+			}
+		}
+		return v;
+	}
 	public static List<OfflinePlayer> listVanished() {
 		List<OfflinePlayer> vanishList = new ArrayList<OfflinePlayer>();
 		List<String> ret = new ArrayList<String>();

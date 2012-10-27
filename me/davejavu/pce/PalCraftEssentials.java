@@ -85,7 +85,7 @@ public class PalCraftEssentials extends JavaPlugin implements Listener {
 			log.log(Level.SEVERE, "MySQL info has not been inputted! Shutting down...");
 			getServer().getPluginManager().disablePlugin(this);
 		}
-		Methods.con = Methods.mysqlConnect(host, port, database, username, password);
+		new Methods(host, port, database, username, password);
 		log.info("[PalCraftEssentials] Startup finished! Took " + (System.currentTimeMillis() - firstTime) + " ms");
 	}
 	

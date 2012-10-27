@@ -8,7 +8,10 @@ import java.sql.Statement;
 
 public class Methods {
 	public static Connection con;
-	//MySQL methods, cba to explain them all.
+	
+	public Methods(String host, String port, String database, String username, String password) {
+		con = mysqlConnect(host, port,database, username, password);
+	}
 	
 	//This is the method that connects to the MySQL database,
 	//All other methods need the connection to be able to get/add/change info etc
@@ -16,15 +19,20 @@ public class Methods {
 	//then use it in all commands as to not create dozens upon dozens of connections,
 	//Finally closing it in onDisable()
 	//(thanks seru)
+	
+	public static Connection getCon() {
+		return con;
+	}
+	
 	public static Connection mysqlConnect(String host, String port, String database, String username, String password) {
-		Connection con = null;
+		Connection conc = null;
 		try{
 			Class.forName("com.mysql.jdbc.Driver");
-			con = DriverManager.getConnection("jdbc:mysql://" + host + ":" + port + "/" + database, username, password);
+			conc = DriverManager.getConnection("jdbc:mysql://" + host + ":" + port + "/" + database, username, password);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		return con;
+		return conc;
 		
 	}
 	
@@ -44,10 +52,6 @@ public class Methods {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		try {
-			con.close();
-		} catch (SQLException e) {
-		}
 	}
 	
 	//Returns all rows in the specified table by executing a simple
@@ -65,9 +69,6 @@ public class Methods {
 			
 		}catch(Exception e){
 		}
-		try {
-			con.close();
-		} catch (SQLException e) {}
 		return result;
 	}
 	
@@ -83,10 +84,6 @@ public class Methods {
 			st.executeUpdate(sql);
 		}catch(Exception e){
 			e.printStackTrace();
-		}
-		try {
-			con.close();
-		} catch (SQLException e) {
 		}
 	}
 	
@@ -104,10 +101,6 @@ public class Methods {
 		}catch (Exception e){
 			e.printStackTrace();
 		}
-		try {
-			con.close();
-		} catch (SQLException e) {
-		}
 	}
 	//Edits the specified row, I made it so "edit1" is the part that will change, and "edit2" is
 	//the 'locator' as such; for example, if I wanted to change "player" to "davejavu" where "id" was "71", I would:
@@ -123,10 +116,6 @@ public class Methods {
 			st.executeUpdate(sql);
 		}catch (Exception e){
 			e.printStackTrace();
-		}
-		try {
-			con.close();
-		} catch (SQLException e) {
 		}
 	}
 	
