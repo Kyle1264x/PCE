@@ -43,6 +43,10 @@ public class reply extends PalCommand {
 						if (permissionCheck(sender, "PalCraftEssentials.command.msg.colours")) {
 							msg = msg.replaceAll("&([0-9a-rA-R])", "§$1");
 						}
+						if (vanish.isVanished(Bukkit.getPlayer(pr))) {
+							sendMessage(sender, ChatColor.RED + "'" + args[0] + "' is not online!");
+							return true;
+						}
 						if (pr.equals("Console")) {
 							log.info("[MESSAGE] [" + pname + " -> console] " + msg);
 							return true;

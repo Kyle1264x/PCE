@@ -44,6 +44,10 @@ public class msg extends PalCommand {
 					if (permissionCheck(sender, "PalCraftEssentials.command.msg.colours")) {
 						msg = msg.replaceAll("&([0-9a-rA-R])", "§$1");
 					}
+					if (vanish.isVanished(pl)) {
+						sendMessage(sender, ChatColor.RED + "'" + args[0] + "' is not online!");
+						return true;
+					}
 					if (!getConfig(pl).getFC().getStringList("block-list").contains(((Player)sender).getName())) {
 						pl.sendMessage(ChatColor.GRAY + "[" + pname + " -> you] " + ChatColor.WHITE + msg);
 						sendMessage(sender, ChatColor.GRAY + "[You -> " + pl.getDisplayName() + "] " + ChatColor.WHITE + msg);

@@ -31,6 +31,10 @@ public class tphere extends PalCommand {
 							sendMessage(sender, ChatColor.RED + "'" + p2.getDisplayName() + "' has teleportation disabled.");
 							return true;
 						}
+						if (vanish.isVanished(p2)) {
+							sendMessage(sender, ChatColor.RED + "'" + args[0] + "' is not online!");
+							return true;
+						}
 						p2.teleport(((Player)sender));
 						sendMessage(sender, ChatColor.GOLD + "Teleported " + ChatColor.WHITE + p2.getDisplayName() + ChatColor.GOLD + " to you");
 						p2.sendMessage(ChatColor.GOLD + "Teleported to " + ChatColor.WHITE + ((Player)sender).getDisplayName());

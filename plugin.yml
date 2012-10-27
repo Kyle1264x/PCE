@@ -26,6 +26,7 @@ permissions:
             PalCraftEssentials.command.heal: true
             PalCraftEssentials.command.heal.others: true
             PalCraftEssentials.command.home: true
+            PalCraftEssentials.command.home.others: true
             PalCraftEssentials.command.item: true
             PalCraftEssentials.command.kick: true
             PalCraftEssentials.command.kickall: true
@@ -116,6 +117,8 @@ permissions:
         default: op
     PalCraftEssentials.command.home:
         default: true
+    PalCraftEssentials.command.home.others:
+        default: op
     PalCraftEssentials.command.item:
         default: op
     PalCraftEssentials.command.kick:
@@ -262,6 +265,8 @@ commands:
     description: Kick a player
   kickall:
     description: Kick all players online
+  list:
+    description: List all players online
   me:
     description: /me!
   more:

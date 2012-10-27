@@ -23,6 +23,10 @@ public class tpa extends PalCommand {
 							sendMessage(sender, ChatColor.RED + "'" + args[0] + "' is not online!");
 							return true;
 						}
+						if (vanish.isVanished(p2)) {
+							sendMessage(sender, ChatColor.RED + "'" + args[0] + "' is not online!");
+							return true;
+						}
 						p2.sendMessage(ChatColor.WHITE + ((Player)sender).getDisplayName() + ChatColor.GOLD + " would like to teleport to you. Either type " + ChatColor.GREEN + "/tpaccept" + ChatColor.GOLD + " or " + ChatColor.RED + "/tpdeny");
 						sendMessage(sender, ChatColor.GOLD + "Request sent to " + ChatColor.WHITE + p2.getDisplayName());
 						PalCraftEssentials.tpa.put(p2.getName().toLowerCase(), ((Player)sender).getName().toLowerCase() + ",1");

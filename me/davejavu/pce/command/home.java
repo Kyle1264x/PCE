@@ -26,9 +26,14 @@ public class home extends PalCommand {
 					String your = "your";
 					OfflinePlayer player = (OfflinePlayer) sender;
 					if (args.length > 0) {
-						player = Bukkit.getOfflinePlayer(args[0]);
-						your = player.getName() + "'s";
-						youhave = player.getName() + " has";
+						if (permissionCheck(sender, "PalCraftEssentials.command.home.others")) {
+							player = Bukkit.getOfflinePlayer(args[0]);
+							your = player.getName() + "'s";
+							youhave = player.getName() + " has";
+						} else {
+							noPermission(cmd.getName() + " - others", sender);
+							return true;
+						}
 					}
 					if (player != null) {
 						CustomConfig pConfig = getConfig(player);

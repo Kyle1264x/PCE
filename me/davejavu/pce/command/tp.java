@@ -32,6 +32,10 @@ public class tp extends PalCommand {
 							sendMessage(sender, ChatColor.RED + "'" + p2.getDisplayName() + "' has teleportation disabled.");
 							return true;
 						}
+						if (vanish.isVanished(p2)) {
+							sendMessage(sender, ChatColor.RED + "'" + args[0] + "' is not online!");
+							return true;
+						}
 						((Player) sender).teleport(p2);
 						
 						sendMessage(sender, ChatColor.GOLD + "Teleported to " + ChatColor.WHITE + p2.getDisplayName());
