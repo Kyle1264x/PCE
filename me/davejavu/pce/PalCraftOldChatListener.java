@@ -23,7 +23,11 @@ import org.bukkit.plugin.Plugin;
 
 @SuppressWarnings("deprecation")
 public class PalCraftOldChatListener implements Listener {
-	//Old chat listener, won't be updated.
+	//Old chat listener.
+	//If you're looking for comments, please look
+	//at the AsyncListener, this class is
+	//identical to it, except this uses the chat
+	//event for pre 1.3
 	
 	Plugin plugin;
 	public PalCraftOldChatListener(PalCraftEssentials plugin) {
@@ -38,10 +42,11 @@ public class PalCraftOldChatListener implements Listener {
 	public static String date = PalCraftEssentials.date;
 	
 	@EventHandler
-	public void onPlayerChat(PlayerChatEvent evt) {
+	public static void onPlayerChat(PlayerChatEvent evt) {
 		Player player = evt.getPlayer();
 		String name = player.getDisplayName();
 		String message = evt.getMessage();
+		
 		if (PalCraftListener.moo.contains(player.getName().toLowerCase())) {
 			name = "Cow";
 			message = "moo";
@@ -53,15 +58,6 @@ public class PalCraftOldChatListener implements Listener {
 		}
 		
 		if (!evt.getMessage().contains("grief")) {
-			if (player.getName().equalsIgnoreCase("ultradude54")) {
-				if (PalCraftListener.ultramute) {
-					for (Player p : evt.getRecipients()) {
-						if (!p.getAddress().getHostString().equalsIgnoreCase(Bukkit.getServer().getPlayer("ultradude54").getAddress().getHostString())) {
-							evt.getRecipients().remove(p);
-						}
-					}
-				}
-			}
 			boolean ig = false;
 			for (String pl : PalCraftListener.gag) {
 				if (player.getName().equalsIgnoreCase(Bukkit.getServer().getPlayer(pl).getName())) {
@@ -91,17 +87,25 @@ public class PalCraftOldChatListener implements Listener {
 				}
 			}
 		}
+		
 		CustomConfig conf = PalCommand.getConfig(player);
 		FileConfiguration fc = conf.getFC();
 		if (fc.getBoolean("mute.boolean")) {
-			long diff = fc.getLong("mute.time") - System.currentTimeMillis();
-			if(diff <= 0){
-				fc.set("mute.boolean", false);
-				conf.save();
-			} else {
-				player.sendMessage(ChatColor.RED + "Muted for "+diff/1000/60+" more minutes!");
+			String d = fc.getString("mute.time");
+			if (d.equalsIgnoreCase("forever")) {
 				evt.setCancelled(true);
+				player.sendMessage(ChatColor.RED + "Muted!");
+			} else {
+				long diff = Long.parseLong(d) - System.currentTimeMillis();
+				if(diff <= 0){
+					fc.set("mute.boolean", false);
+					conf.save();
+				} else {
+					player.sendMessage(ChatColor.RED + "Muted for "+diff/1000/60+" more minutes!");
+					evt.setCancelled(true);
+				}
 			}
+			
 		}
 		if (PalCommand.permissionCheck((CommandSender)player,"PalCraftEssentials.chat.colours")) {
 			message = message.replaceAll("&([0-9a-rA-R])", "§$1");

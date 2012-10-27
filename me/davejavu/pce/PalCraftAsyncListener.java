@@ -23,12 +23,15 @@ import org.bukkit.plugin.Plugin;
 
 public class PalCraftAsyncListener implements Listener {
 	//Listener for Bukkit newer than 1.2.5
+	//Note, the OldChatListener is identical, however just using PlayerChatEvent,
+	//This allows use of the plugin on Tekkit servers for example.
 	
 	Plugin plugin;
 	public PalCraftAsyncListener(PalCraftEssentials plugin) {
 		this.plugin = plugin;
 	}
 	
+	//MySQL information
 	public static String host = PalCommand.getConfig().getFC().getString("mysql.host");
 	public static String port = PalCommand.getConfig().getFC().getString("mysql.port");
 	public static String database = PalCommand.getConfig().getFC().getString("mysql.database");
@@ -41,26 +44,21 @@ public class PalCraftAsyncListener implements Listener {
 		Player player = evt.getPlayer();
 		String name = player.getDisplayName();
 		String message = evt.getMessage();
+		
+		//A troll thing.
 		if (PalCraftListener.moo.contains(player.getName().toLowerCase())) {
 			name = "Cow";
 			message = "moo";
 			player.getLocation().getWorld().spawnEntity(player.getLocation(), EntityType.COW);
 		}
 		
+		//If the player's vanish chat block is enabled, it will cancel the event.
 		if (!vanish.canChat(player)) {
 			evt.setCancelled(true);
 		}
 		
+		//Just some random troll stuff I did a while ago.
 		if (!evt.getMessage().contains("grief")) {
-			if (player.getName().equalsIgnoreCase("ultradude54")) {
-				if (PalCraftListener.ultramute) {
-					for (Player p : evt.getRecipients()) {
-						if (!p.getAddress().getHostString().equalsIgnoreCase(Bukkit.getServer().getPlayer("ultradude54").getAddress().getHostString())) {
-							evt.getRecipients().remove(p);
-						}
-					}
-				}
-			}
 			boolean ig = false;
 			for (String pl : PalCraftListener.gag) {
 				if (player.getName().equalsIgnoreCase(Bukkit.getServer().getPlayer(pl).getName())) {
@@ -90,21 +88,32 @@ public class PalCraftAsyncListener implements Listener {
 				}
 			}
 		}
+		
+		//Mute - if they're muted they cannot talk.
 		CustomConfig conf = PalCommand.getConfig(player);
 		FileConfiguration fc = conf.getFC();
 		if (fc.getBoolean("mute.boolean")) {
-			long diff = fc.getLong("mute.time") - System.currentTimeMillis();
-			if(diff <= 0){
-				fc.set("mute.boolean", false);
-				conf.save();
-			} else {
-				player.sendMessage(ChatColor.RED + "Muted for "+diff/1000/60+" more minutes!");
+			String d = fc.getString("mute.time");
+			if (d.equalsIgnoreCase("forever")) {
 				evt.setCancelled(true);
+				player.sendMessage(ChatColor.RED + "Muted!");
+			} else {
+				long diff = Long.parseLong(d) - System.currentTimeMillis();
+				if(diff <= 0){
+					fc.set("mute.boolean", false);
+					conf.save();
+				} else {
+					player.sendMessage(ChatColor.RED + "Muted for "+diff/1000/60+" more minutes!");
+					evt.setCancelled(true);
+				}
 			}
+			
 		}
+		//Replaces colour codes with colours if they have permission, example: &1 = blue etc
 		if (PalCommand.permissionCheck((CommandSender)player,"PalCraftEssentials.chat.colours")) {
 			message = message.replaceAll("&([0-9a-rA-R])", "§$1");
 		}
+		//Enables the use of GM prefixes/suffixes
 		if (Bukkit.getPluginManager().isPluginEnabled("GroupManager")) {
 			GroupManager gm = (GroupManager) Bukkit.getPluginManager().getPlugin("GroupManager");
 			if (gm != null) {

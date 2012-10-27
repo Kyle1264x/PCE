@@ -56,13 +56,12 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.util.Vector;
 
 public class PalCraftListener implements Listener {
+	
 	static Plugin plugin;
 	
 	public PalCraftListener(PalCraftEssentials plugin) {
 		PalCraftListener.plugin = plugin;
-		//this.consumer = ((LogBlock)Bukkit.getPluginManager().getPlugin("LogBlock")).getConsumer();
 	}
-	
 	public static boolean ultramute = false;
 	
 	public static String[] commands;
@@ -218,7 +217,9 @@ public class PalCraftListener implements Listener {
 	
 	@EventHandler
 	public void onPlayerDeath(PlayerDeathEvent evt) {
+		//Set back location to death location
 		back.setBack(evt.getEntity(), evt.getEntity().getLocation());
+		//To restore items after people fall out of world, as it's a bug.
 		if (evt.getDeathMessage().equalsIgnoreCase(evt.getEntity().getName() + " fell out of the world")) {
 			Player player = evt.getEntity();
 			if (fOW.containsKey(player.getName().toLowerCase())) {
@@ -241,6 +242,9 @@ public class PalCraftListener implements Listener {
 	public void onPlayerJoin(PlayerJoinEvent evt){
 		plugin.reloadConfig();
 		Player player = evt.getPlayer();
+		//Start of playtime - then either when a player/console types /playtime
+		//the playtime in their config will be updated as to give the most
+		//accurate playtime, down to seconds.
 		play.put(player.getName().toLowerCase(), System.currentTimeMillis());
 		
 		
@@ -558,18 +562,6 @@ public class PalCraftListener implements Listener {
 		if (vanish.isVanished(player) && !vanish.canInteract(player)) {
 			evt.setCancelled(true);
 		}
-		if (evt.getBlock().getType() == Material.SPONGE) {
-			Location bLoc = evt.getBlock().getLocation();
-			bLoc.setY(bLoc.getY() + 1);
-			int x = bLoc.getBlockX();
-			int y = bLoc.getBlockY();
-			int z = bLoc.getBlockZ();
-			if ((bLoc.getWorld().getBlockAt(x+1, y, z).getType() == Material.BEDROCK) && (bLoc.getWorld().getBlockAt(x-2, y, z).getType() == Material.BEDROCK) && (bLoc.getWorld().getBlockAt(x, y, z+1).getType() == Material.BEDROCK) && (bLoc.getWorld().getBlockAt(x, y, z-2).getType() == Material.BEDROCK)) {
-				player.sendMessage(ChatColor.GOLD + "Trampoline created.");
-			}
-		}
-		
-		
 	}
 	
 	@EventHandler
@@ -600,6 +592,9 @@ public class PalCraftListener implements Listener {
 		}
 		
 	}
+	
+	
+	
 	public static String isBanned(OfflinePlayer player) {
 		String banreason = " ";
 		//Perma ban

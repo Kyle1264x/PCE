@@ -26,7 +26,7 @@ public class repair extends PalCommand {
 				if (permissionCheck(sender, "PalCraftEssentials.command.repair")) {
 					if (((Player)sender).getItemInHand() != null) {
 						ItemStack itemInHand = ((Player)sender).getItemInHand();
-						itemInHand.setDurability(itemInHand.getType().getMaxDurability());
+						itemInHand.setDurability((short) 0);
 						sendMessage(sender, ChatColor.GOLD + "Repaired your " + ChatColor.WHITE + itemInHand.getType().toString().toLowerCase());
 						return true;
 					} else {

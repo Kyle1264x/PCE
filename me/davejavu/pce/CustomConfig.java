@@ -9,11 +9,16 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 public class CustomConfig {
+	//CustomConfig - enables you to create other configs, e.g one per
+	//player, or one containing specific information etc
+	
 	FileConfiguration fileConfig = null;
 	File fileConfigFile = null;
 	String path;
 	String fileName;
+	
 	public CustomConfig(String path, String name) {
+		//Just to be sure I typed in the path correctly :P
 		if (path.endsWith("/")) {
     		path.charAt(path.toCharArray().length - 1);
     		String[] pt = path.split("/");
@@ -46,6 +51,7 @@ public class CustomConfig {
 	public FileConfiguration getFC() {
 		return fileConfig;
 	}
+	//Saves the specifiec FileConfiguration to the disk
 	public void save(FileConfiguration fc) {
 		try {
 			fc.save(fileConfigFile);
@@ -61,7 +67,7 @@ public class CustomConfig {
 			e.printStackTrace();
 		}
 	}
-	//Returns ALL player configs.
+	//Returns a list of ALL player configs
 	public static List<String> listPlayerConfigs() {
 		List<String> ret = new ArrayList<String>();
 		File dir = new File("./plugins/PalCraftEssentials/players");

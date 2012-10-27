@@ -28,13 +28,24 @@ public class item extends PalCommand {
 						Material mat;
 						int amt = 64;
 						byte data = (byte) 0;
-						if (args[0].matches("-?\\d+(.\\d+)?")){
-							mat = Material.getMaterial(Integer.parseInt(args[0]));
+						String matS = args[0];
+						if (args[0].contains(":")) {
+							matS = args[0].split(":")[0];
+							try{
+								data = (byte) Integer.parseInt(args[0].split(":")[1]);
+							} catch (NumberFormatException e) {
+								sendMessage(sender, ChatColor.RED + "'" + args[0].split(":")[1] + "' isn't a valid data value!");
+								return true;
+							}
+						}
+						
+						if (matS.matches("-?\\d+(.\\d+)?")){
+							mat = Material.getMaterial(Integer.parseInt(matS));
 							if (mat == null) {
 								sendMessage(sender, ChatColor.RED + "No item with id " + args[0]);
 							}
 						} else {
-							mat = Material.getMaterial(args[0].toUpperCase());
+							mat = Material.matchMaterial(matS.toUpperCase());
 							if (mat == null) {
 								sendMessage(sender, ChatColor.RED + "No item with name " + args[0]);
 								return true;

@@ -21,7 +21,7 @@ public class mute extends PalCommand {
 					if (Bukkit.getServer().matchPlayer(args[0]).isEmpty()){
 						sendMessage(sender,ChatColor.RED + "Player is not online!");
 						return true;
-					}else{
+					} else {
 						Player p2 = getPlayer(args[0]);
 						if (p2 == null) {
 							sendMessage(sender, ChatColor.RED + "'" + args[0] + "' is not online!");
@@ -31,16 +31,18 @@ public class mute extends PalCommand {
 							CustomConfig con = getConfig(p2);
 							if (con.getFC().getBoolean("mute.boolean")){
 								con.getFC().set("mute.boolean", false);
+								con.getFC().set("mute.time", "");
 								con.save();
 								sendMessage(sender,ChatColor.GOLD + p2.getName() + " unmuted.");
 								return true;
 							}else{
 								con.getFC().set("mute.boolean", true);
+								con.getFC().set("mute.time", "forever");
 								con.save();
 								sendMessage(sender,ChatColor.GOLD + p2.getName() + " muted.");
 								return true;
 							}
-						}else{
+						} else {
 							if (args.length == 3){
 								try{
 									Integer.parseInt(args[1]);
@@ -61,7 +63,7 @@ public class mute extends PalCommand {
 									sendMessage(sender,ChatColor.RED + "Usage: /mute <player> [time] [sec/min/hour]");
 									return true;
 								}
-							}else{
+							} else {
 								sendMessage(sender, ChatColor.RED + "Usage: /mute <player> [time] [sec/min/hour]");
 								return true;
 							}

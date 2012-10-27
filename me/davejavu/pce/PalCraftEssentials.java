@@ -16,7 +16,6 @@ import java.util.logging.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
@@ -41,7 +40,7 @@ public class PalCraftEssentials extends JavaPlugin implements Listener {
 	public static String username = PalCommand.getConfig().getFC().getString("mysql.username");
 	public static String password = PalCommand.getConfig().getFC().getString("mysql.password");
 	
-	//HashMaps for stuff.
+	//HashMaps for storing temporary data
 	public static HashMap<String, String> reply = new HashMap<String, String>();
 	public static HashMap<String, String> tpa = new HashMap<String, String>();
 	
@@ -50,50 +49,38 @@ public class PalCraftEssentials extends JavaPlugin implements Listener {
 	
 	
 	public void onEnable() {
+		//Taking the time at the start of startup - enables us to
+		//see how long overall startup took by taking the start time
+		//away from the end time.
 		long firstTime = System.currentTimeMillis();
 		log.info("[PalCraftEssentials] Starting startup...");
 		plugin = this;
 		PalCraftListener.commands = getCommands();
 		for (String cmd : PalCraftListener.commands) {
 			try{
-				getCommand(cmd.toLowerCase()).setExecutor((CommandExecutor) Class.forName("me.davejavu.palcraftessentials.command."+cmd.toLowerCase()).newInstance());
-
+				//Sets command executor for each command specifically.
+				getCommand(cmd.toLowerCase()).setExecutor((CommandExecutor) Class.forName("me.davejavu.pce.command."+cmd.toLowerCase()).newInstance());
 			} catch (Exception e) {
 				log.log(Level.SEVERE, "Could not set command executor for: " + cmd);
 				e.printStackTrace();
 			}
 			
 		}
-		for (String str : new String[] {"/", "superpickaxe"}) {
-			if (Bukkit.getPluginCommand(str) != null)
-				try {
-					Bukkit.getPluginCommand(str).setExecutor((CommandExecutor) Class.forName("me.davejavu.palcraftessentials.command.superpick").newInstance());
-				} catch (InstantiationException e) {
-					e.printStackTrace();
-				} catch (IllegalAccessException e) {
-					e.printStackTrace();
-				} catch (ClassNotFoundException e) {
-					e.printStackTrace();
-				}
-		}
+		//Sets the chat listener depending on the version of bukkit being used.
 		if (Bukkit.getBukkitVersion().startsWith("1.2.5")) {
 			getServer().getPluginManager().registerEvents(new PalCraftOldChatListener(this), this);
 		} else {
 			getServer().getPluginManager().registerEvents(new PalCraftAsyncListener(this), this);
 		}
-		log.info("[PCE] BUKKIT VERSION: " + Bukkit.getBukkitVersion() + " VERSION: " + Bukkit.getVersion());
 		getServer().getPluginManager().registerEvents(new PalCraftListener(this), this);
+		//In case of reload add all online players to the online list
 		for (Player p : getServer().getOnlinePlayers()) {
 			PalCraftListener.online.add(p.getName());
 		}
 		log.info("[PalCraftEssentials] Version 2 enabled!");
 		getConfig().options().copyDefaults(true);
 		saveConfig();
-		host = getConfig().getString("mysql.host");
-		port = getConfig().getString("mysql.port");
-		database = getConfig().getString("mysql.database");
-		username = getConfig().getString("mysql.username");
-		password = getConfig().getString("mysql.password");
+		//If the MySQL information is not entered, the plugin shuts itself down.
 		if (getConfig().getString("mysql.host").equalsIgnoreCase("enter host")) {
 			log.log(Level.SEVERE, "MySQL info has not been inputted! Shutting down...");
 			getServer().getPluginManager().disablePlugin(this);
@@ -104,35 +91,20 @@ public class PalCraftEssentials extends JavaPlugin implements Listener {
 	
 	public void onDisable() {
 		try {
+			//Close connection.
 			Methods.con.close();
 		} catch (SQLException e) {
-			log.log(Level.SEVERE, "Error closing the connection! Stack trace:");
-			e.printStackTrace();
+			log.log(Level.SEVERE, "Error closing the connection! Error: " + e.getCause());
 		}
 		log.info("[PalCraftEssentials] Version 2 disabled!");
+		//Reload then save config to firstly check for any manual changes that have
+		//been made then save it to the disk.
 		reloadConfig();
 		saveConfig();
 	}
 	
-	public static void sendMessage(CommandSender sender, String message) {
-		if (sender instanceof Player) {
-			Player p = (Player) sender;
-			p.sendMessage(message);
-		} else {
-			log.info(message);
-		}
-	}
 	
-	public static boolean permissionCheck(CommandSender sender, String permission) {
-		if (sender instanceof Player) {
-			Player p = (Player) sender;
-			return p.hasPermission(permission);
-		} else {
-			return true;
-		}
-	}
-	
-	//Long -> String
+	//Long -> time format, 1 day 2 hours 6 minutes 26 seconds
 	public static String parseLongToString(long millis) {
 		String rt = "";
 		long days = TimeUnit.MILLISECONDS.toDays(millis);
@@ -157,7 +129,9 @@ public class PalCraftEssentials extends JavaPlugin implements Listener {
 		return result;
 	}
 	
+	
 	//Warp stuff
+	//Set a warp with the name specified, at the location specified
 	public static String setWarp(String name, Location loc) {
 		CustomConfig customConfig = new CustomConfig("./plugins/PalCraftEssentials/warps", name);
 		FileConfiguration warpConfig = customConfig.getFC();
@@ -175,7 +149,7 @@ public class PalCraftEssentials extends JavaPlugin implements Listener {
 		}
 		return "noerror";
 	}
-	
+	//Returns the location of the warp with the name specified.
 	public static Location getWarp(String name) {
 		Location loc;
 		String folder = "./plugins/PalCraftEssentials/warps";
@@ -196,7 +170,7 @@ public class PalCraftEssentials extends JavaPlugin implements Listener {
 			return null;
 		}
 	}
-	
+	//Lists all warps.
 	public static List<String> listWarps() {
 		File warpFolder = new File("./plugins/PalCraftEssentials/warps");
 		List<String> ret = new ArrayList<String>();
@@ -211,7 +185,7 @@ public class PalCraftEssentials extends JavaPlugin implements Listener {
 		}
 		return ret;
 	}
-	
+	//Deletes a file.
 	public static String deleteFile(String path, String name) {
 		String ret = "none";
 		File file = new File(path + File.separator + name);

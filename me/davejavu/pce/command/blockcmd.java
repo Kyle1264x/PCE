@@ -25,7 +25,7 @@ public class blockcmd extends PalCommand {
 					CustomConfig conf = getConfig(player);
 					if (conf.getFC().getBoolean("block-commands.boolean") == true) {
 						conf.getFC().set("block-commands.boolean", false);
-						conf.getFC().set("block-commands.time", "off");
+						conf.getFC().set("block-commands.time", "");
 					} else {
 						conf.getFC().set("block-commands.boolean", true);
 						conf.getFC().set("block-commands.time", "forever");

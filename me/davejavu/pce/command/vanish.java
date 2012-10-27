@@ -30,25 +30,32 @@ public class vanish extends PalCommand {
 							boolean canChat = pC.getFC().getBoolean("vanish.chat");
 							pC.getFC().set("vanish.chat", !canChat);
 							pC.save();
-							sendMessage(sender, ChatColor.GOLD + "Chat block" + ChatColor.WHITE + ": " + (canChat ? ChatColor.GREEN + "On" : ChatColor.RED + "Off"));
+							sendMessage(sender, ChatColor.GOLD + "Chat" + ChatColor.WHITE + ": " + (!canChat ? ChatColor.GREEN + "On" : ChatColor.RED + "Off"));
+							return true;
 						} else if (args[0].equalsIgnoreCase("ni") || args[0].equalsIgnoreCase("nointeract")) {
 							CustomConfig pCc = getConfig(player);
 							boolean canInteract = pCc.getFC().getBoolean("vanish.interact");
 							pCc.getFC().set("vanish.interact", !canInteract);
 							pCc.save();
-							sendMessage(sender, ChatColor.GOLD + "Interact block" + ChatColor.WHITE + ": " + (canInteract ? ChatColor.GREEN + "On" : ChatColor.RED + "Off"));
+							sendMessage(sender, ChatColor.GOLD + "Interact" + ChatColor.WHITE + ": " + (!canInteract ? ChatColor.GREEN + "On" : ChatColor.RED + "Off"));
+							return true;
 						} else if (args[0].equalsIgnoreCase("check")) {
 							sendMessage(sender, ChatColor.GOLD + "Vanish: " + ChatColor.WHITE + ": " + (isVanished(player) ? ChatColor.GREEN + "On" : ChatColor.RED + "Off"));
+							return true;
 						} else if (args[0].equalsIgnoreCase("fj") || args[0].equalsIgnoreCase("fakejoin")) {
 							Bukkit.broadcastMessage(ChatColor.YELLOW + player.getName() + " joined the game");
 							setVanish(player, false);
 							warnPWP(player, false);
+							return true;
 						} else if (args[0].equalsIgnoreCase("fq") || args[0].equalsIgnoreCase("fakequit")) {
 							Bukkit.broadcastMessage(ChatColor.YELLOW + player.getName() + " left the game");
 							setVanish(player, true);
 							warnPWP(player, true);
+							return true;
+						} else {
+							sendMessage(sender, ChatColor.RED + "Usage: /v <nc/ni/fj/fq/check>");
+							return true;
 						}
-						return true;
 					} else {
 						boolean b = toggleVanish(player);
 						sendMessage(sender, ChatColor.GOLD + "Vanish" + ChatColor.WHITE + ": " + (b ? ChatColor.GREEN + "On" : ChatColor.RED + "Off"));

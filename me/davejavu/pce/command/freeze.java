@@ -29,7 +29,7 @@ public class freeze extends PalCommand {
 					if (conf.getFC().contains("freeze.boolean")) {
 						if (fr == true) {
 							conf.getFC().set("freeze.boolean", false);
-							conf.getFC().set("freeze.time", "off");
+							conf.getFC().set("freeze.time", "");
 						} else {
 							conf.getFC().set("freeze.boolean", true);
 							conf.getFC().set("freeze.time", "forever");
