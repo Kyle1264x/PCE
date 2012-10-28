@@ -6,10 +6,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-public class Methods {
+public class MySQL {
 	public static Connection con;
 	
-	public Methods(String host, String port, String database, String username, String password) {
+	public MySQL(String host, String port, String database, String username, String password) {
 		con = mysqlConnect(host, port,database, username, password);
 	}
 	

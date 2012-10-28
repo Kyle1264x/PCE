@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.logging.Logger;
 
+import me.davejavu.pce.command.afk;
 import me.davejavu.pce.command.back;
 import me.davejavu.pce.command.vanish;
 
@@ -137,6 +138,7 @@ public class PalCraftListener implements Listener {
 	@EventHandler
 	public void onBlockDamage(BlockDamageEvent evt) {
 		Player player = evt.getPlayer();
+		afk.updateActivity(player);
 		CustomConfig conf = PalCommand.getConfig(player);
 		if (conf.getFC().getBoolean("superpick") && (player.getItemInHand().getType() == Material.DIAMOND_PICKAXE)) {
 			if (evt.getBlock().getTypeId() != 7 || player.hasPermission("PalCraftEssentials.superpick.bedrock")) {
@@ -148,6 +150,7 @@ public class PalCraftListener implements Listener {
 	@EventHandler
 	public void onPlayerClick(PlayerInteractEvent evt) {
 		Player player = evt.getPlayer();
+		afk.updateActivity(player);
 		if ((evt.getAction() == Action.RIGHT_CLICK_BLOCK) && (evt.getClickedBlock().getType() == Material.CHEST) && (vanish.isVanished(player))) {
 			evt.setCancelled(true);
 			Chest chest = (Chest) evt.getClickedBlock().getState();
@@ -155,6 +158,7 @@ public class PalCraftListener implements Listener {
 			i.setContents(chest.getInventory().getContents());
 			player.openInventory(i);
 			player.sendMessage(ChatColor.GOLD + "Opening chest silently - no editing.");
+			
 			return;
 		}
 		try{
@@ -200,6 +204,7 @@ public class PalCraftListener implements Listener {
 	@EventHandler
 	public void onShear(PlayerShearEntityEvent evt) {
 		Player player = evt.getPlayer();
+		afk.updateActivity(player);
 		if (vanish.isVanished(player) && !vanish.canInteract(player)) {
 			evt.setCancelled(true);
 		}
@@ -208,6 +213,7 @@ public class PalCraftListener implements Listener {
 	@EventHandler
 	public void onItemPickup(PlayerPickupItemEvent evt) {
 		Player player = evt.getPlayer();
+		afk.updateActivity(player);
 		if (vanish.isVanished(player) && !vanish.canInteract(player)) {
 			evt.setCancelled(true);
 		}
@@ -216,6 +222,7 @@ public class PalCraftListener implements Listener {
 	@EventHandler
 	public void onItemDrop(PlayerDropItemEvent evt) {
 		Player player = evt.getPlayer();
+		afk.updateActivity(player);
 		if (vanish.isVanished(player) && !vanish.canInteract(player)) {
 			evt.setCancelled(true);
 		}
@@ -228,6 +235,7 @@ public class PalCraftListener implements Listener {
 		//To restore items after people fall out of world, as it's a bug.
 		if (evt.getDeathMessage().equalsIgnoreCase(evt.getEntity().getName() + " fell out of the world")) {
 			Player player = evt.getEntity();
+			afk.updateActivity(player);
 			if (fOW.containsKey(player.getName().toLowerCase())) {
 				fOW.remove(player.getName().toLowerCase());
 			}
@@ -331,6 +339,9 @@ public class PalCraftListener implements Listener {
 			fc.set("block-commands.time", 0L);
 			whatIsReset.append("block-commands, ");
 		}
+		if (!fc.contains("afk")) {
+			fc.set("afk", false);
+		}
 		playerCustomConfig.save();
 		if (whatIsReset != new StringBuilder()) 
 			player.sendMessage("Forced to reset: " + whatIsReset.toString());
@@ -426,6 +437,7 @@ public class PalCraftListener implements Listener {
 		Entity e = evt.getEntity();
 		if (e instanceof Player) {
 			Player player = (Player) e;
+			afk.updateActivity(player);
 			boolean god = PalCommand.getConfig(player).getFC().getBoolean("god");
 			boolean va = vanish.isVanished(player);
 			if (god || va) {
@@ -445,6 +457,7 @@ public class PalCraftListener implements Listener {
 		Entity e = evt.getEntity();
 		if (e instanceof Player) {
 			Player player = (Player) e;
+			afk.updateActivity(player);
 			boolean god = PalCommand.getConfig(player).getFC().getBoolean("god");
 			boolean pvp = PalCommand.getConfig(player).getFC().getBoolean("pvp");
 			//Doing damage
@@ -475,6 +488,7 @@ public class PalCraftListener implements Listener {
 	@EventHandler
 	public void onPlayerMove(PlayerMoveEvent evt) {
 		Player player = evt.getPlayer();
+		afk.updateActivity(player);
 		CustomConfig pC = PalCommand.getConfig(player);
 		FileConfiguration fc = pC.getFC();
 		if (fc.getBoolean("freeze.boolean")) {
@@ -535,6 +549,7 @@ public class PalCraftListener implements Listener {
 	@EventHandler
 	public void onBlockBreak(BlockBreakEvent evt) {
 		Player player = evt.getPlayer();
+		afk.updateActivity(player);
 		if (vanish.isVanished(player) && !vanish.canInteract(player)) {
 			evt.setCancelled(true);
 		}
@@ -571,6 +586,7 @@ public class PalCraftListener implements Listener {
 	@EventHandler
 	public void onBlockPlace(BlockPlaceEvent evt) {
 		Player player = evt.getPlayer();
+		afk.updateActivity(player);
 		if (vanish.isVanished(player) && !vanish.canInteract(player)) {
 			evt.setCancelled(true);
 		}
@@ -609,9 +625,9 @@ public class PalCraftListener implements Listener {
 	
 	public static String isBanned(OfflinePlayer player) {
 		String banreason = " ";
-		//Perma ban
+		//Permanent ban
 		boolean banned = false;	
-		ResultSet rpl = Methods.getRows(Methods.con, "perma_bans");
+		ResultSet rpl = MySQL.getRows(MySQL.con, "perma_bans");
 			try{
 				while(rpl.next()) {
 					if (player.getName().equalsIgnoreCase(rpl.getString("player"))) {
@@ -629,7 +645,7 @@ public class PalCraftListener implements Listener {
 			int id = -1;
 			boolean b = false;
 			String when = "";
-			ResultSet rtm = Methods.getRows(Methods.con, "temp_bans");
+			ResultSet rtm = MySQL.getRows(MySQL.con, "temp_bans");
 			try{
 				while(rtm.next()) {
 					if (player.getName().equalsIgnoreCase(rtm.getString("player"))) {
@@ -651,7 +667,7 @@ public class PalCraftListener implements Listener {
 				
 				
 				if(diff <= 0){
-					Methods.deleteRow(Methods.con, "temp_bans", id, "player = '" + player.getName().toLowerCase() + "'");
+					MySQL.deleteRow(MySQL.con, "temp_bans", id, "player = '" + player.getName().toLowerCase() + "'");
 					banreason = " ";
 				}else{
 					banreason = "Temp banned - "+diff/1000/60+" mins: " + banreason;
@@ -660,30 +676,14 @@ public class PalCraftListener implements Listener {
 			
 		} else {
 			
-			//if (player.isBanned()) {
-			//	banreason = PalCommand.getConfig().getFC().getString("local.bans." + player.getName().toLowerCase());
-			//}
+			if (player.isBanned()) {
+				banreason = PalCommand.getConfig().getFC().getString("local.bans." + player.getName().toLowerCase());
+			}
 			
 		}
 		return banreason;
 	}
 	public static long parseTimeSpec(String time, String unit) {
-		/*long sec = Integer.parseInt(time)*60;
-		if (unit.startsWith("hour"))
-			sec *= 60;
-		else if (unit.startsWith("day"))
-			sec *= (60*24);
-		else if (unit.startsWith("week"))
-			sec *= (7*60*24);
-		else if (unit.startsWith("month"))
-			sec *= (30*60*24);
-		else if (unit.startsWith("min"))
-			sec *= 1;
-		else if (unit.startsWith("sec"))
-			sec /= 60;
-		return sec*1000;
-		*/
-		
 		long ms = Integer.parseInt(time) * 1000;
 		if (unit.startsWith("sec")) {
 			return ms;
@@ -708,7 +708,7 @@ public class PalCraftListener implements Listener {
 	
 	public static boolean isTempBanned(OfflinePlayer player) {
 		boolean b = false;
-		ResultSet rtm = Methods.getRows(Methods.con, "temp_bans");
+		ResultSet rtm = MySQL.getRows(MySQL.con, "temp_bans");
 		try{
 			while(rtm.next()) {
 				if (player.getName().equalsIgnoreCase(rtm.getString("player"))) {

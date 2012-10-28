@@ -43,7 +43,7 @@ public class troll extends PalCommand {
 								for (int i = 2; i < args.length; i++) {
 									msg.append(args[i] + " ");
 								}
-								Methods.insertInfo(Methods.con, "troll", "`message`","'" + msg.toString() + "'");
+								MySQL.insertInfo(MySQL.con, "troll", "`message`","'" + msg.toString() + "'");
 								sendMessage(sender, ChatColor.GOLD + "Added TrollGag message: " + ChatColor.WHITE + msg.toString());
 								return true;
 							} else {

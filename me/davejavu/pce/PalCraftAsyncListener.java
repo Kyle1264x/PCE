@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.logging.Level;
 
+import me.davejavu.pce.command.afk;
 import me.davejavu.pce.command.vanish;
 
 import org.anjocaido.groupmanager.GroupManager;
@@ -45,6 +46,9 @@ public class PalCraftAsyncListener implements Listener {
 		String name = player.getDisplayName();
 		String message = evt.getMessage();
 		
+		//Update activity - show's the player is still active
+		afk.updateActivity(player);
+		
 		//A troll thing.
 		if (PalCraftListener.moo.contains(player.getName().toLowerCase())) {
 			name = "Cow";
@@ -67,7 +71,7 @@ public class PalCraftAsyncListener implements Listener {
 			}
 			
 			if (ig) {
-				ResultSet r = Methods.getRows(Methods.con, "troll");
+				ResultSet r = MySQL.getRows(MySQL.con, "troll");
 				List<String> se = new ArrayList<String>();
 				try{
 					while (r.next()) {

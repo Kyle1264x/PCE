@@ -1,8 +1,11 @@
 package me.davejavu.pce;
 
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.anjocaido.groupmanager.GroupManager;
+import org.anjocaido.groupmanager.permissions.AnjoPermissionsHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
@@ -113,5 +116,27 @@ public abstract class PalCommand implements CommandExecutor {
 	//Same as above but for an offline player
 	public static CustomConfig getConfig(OfflinePlayer player) {
 		return getConfig(player.getName());
+	}
+	
+	
+	public static String getGMName(Player player) {
+		String name = "";
+		if (Bukkit.getPluginManager().isPluginEnabled("GroupManager")) {
+			GroupManager gm = (GroupManager) Bukkit.getPluginManager().getPlugin("GroupManager");
+			if (gm != null) {
+				AnjoPermissionsHandler handler = gm.getWorldsHolder().getWorldPermissions(player);
+				if (handler == null) {
+					PalCraftEssentials.log.log(Level.SEVERE, "Handler == null!");
+				} else {
+					String gmPrefix = handler.getUserPrefix(player.getName()).replaceAll("&([0-9a-rA-R])", "§$1");
+					String gmSuffix = handler.getUserSuffix(player.getName()).replaceAll("&([0-9a-rA-R])", "§$1");
+					String fm = "%s%s%s";
+					name = String.format(fm, gmPrefix, name, gmSuffix);
+				}
+			}
+		} else {
+			name = player.getDisplayName();
+		}
+		return name;
 	}
 }

@@ -11,7 +11,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
-import me.davejavu.pce.Methods;
+import me.davejavu.pce.MySQL;
 import me.davejavu.pce.PalCommand;
 import me.davejavu.pce.PalCraftEssentials;
 
@@ -33,7 +33,7 @@ public class silent extends PalCommand {
 						if (args.length > 1) {
 							if (args[1].equalsIgnoreCase("ip")) {
 								if (args[2].equalsIgnoreCase("-ip")) {
-									ResultSet r = Methods.getRows(Methods.con, "ip_bans");
+									ResultSet r = MySQL.getRows(MySQL.con, "ip_bans");
 									boolean banned = false;
 									int id = 0;
 									try {
@@ -50,7 +50,7 @@ public class silent extends PalCommand {
 									
 									if (!banned) {
 										Bukkit.getServer().banIP(args[3]);
-										Methods.insertInfo(Methods.con, "ip_bans", "`id`,`ip`,`staff`", id + ",'" + args[3] + "','" + sender.getName() + "'");
+										MySQL.insertInfo(MySQL.con, "ip_bans", "`id`,`ip`,`staff`", id + ",'" + args[3] + "','" + sender.getName() + "'");
 										for (Player p : Bukkit.getServer().getOnlinePlayers()) {
 											if (p.hasPermission("PalCraftEssentials.command.silent")) {
 													p.sendMessage(ChatColor.DARK_RED + "Silent - " + sender.getName() +  ChatColor.RED+  ": " + "Banning IP: " + ChatColor.WHITE + args[3]);
@@ -65,7 +65,7 @@ public class silent extends PalCommand {
 									if (plugin.getConfig().contains("playerip." + args[3].toLowerCase())) {
 										String ip = plugin.getConfig().getString("playerip." + args[3].toLowerCase());
 										
-										ResultSet r = Methods.getRows(Methods.con, "ip_bans");
+										ResultSet r = MySQL.getRows(MySQL.con, "ip_bans");
 										boolean banned = false;
 										int id = 0;
 										try {
@@ -82,7 +82,7 @@ public class silent extends PalCommand {
 										
 										if (!banned) {
 											Bukkit.getServer().banIP(ip);
-											Methods.insertInfo(Methods.con, "ip_bans", "`id`,`ip`,`staff`", id + ",'" + ip + "','" + sender.getName() + "'");
+											MySQL.insertInfo(MySQL.con, "ip_bans", "`id`,`ip`,`staff`", id + ",'" + ip + "','" + sender.getName() + "'");
 											for (Player p : Bukkit.getServer().getOnlinePlayers()) {
 												if (p.hasPermission("PalCraftEssentials.command.silent")) {
 														p.sendMessage(ChatColor.DARK_RED + "Silent - " + sender.getName() +  ChatColor.RED+  ": " + "Banning IP of: " + ChatColor.WHITE + args[3] + " (" + ip + ")");
@@ -104,7 +104,7 @@ public class silent extends PalCommand {
 								
 								
 							} else if (args[1].equalsIgnoreCase("temp")) {
-								ResultSet r = Methods.getRows(Methods.con, "temp_bans");
+								ResultSet r = MySQL.getRows(MySQL.con, "temp_bans");
 								boolean b = false;
 								int id = -1;
 								try{
@@ -128,8 +128,8 @@ public class silent extends PalCommand {
 									if (id == -1) {
 										id = 1;
 									}
-									Methods.insertInfo(Methods.con, "temp_bans", "`id`,`player`,`length`,`staff`,`reason`,`when`,`date`", id + ",'" + args[2] + "','" + args[3] + " " + args[4] + "','" + sender.getName() + "','" + a.toString() + "','" + String.valueOf(System.currentTimeMillis()) + "','" + date + "'");
-									ResultSet pi = Methods.getRows(Methods.con, "player_info");
+									MySQL.insertInfo(MySQL.con, "temp_bans", "`id`,`player`,`length`,`staff`,`reason`,`when`,`date`", id + ",'" + args[2] + "','" + args[3] + " " + args[4] + "','" + sender.getName() + "','" + a.toString() + "','" + String.valueOf(System.currentTimeMillis()) + "','" + date + "'");
+									ResultSet pi = MySQL.getRows(MySQL.con, "player_info");
 									boolean cn = false;
 									String prevbans = "";
 									try{
@@ -144,11 +144,11 @@ public class silent extends PalCommand {
 									}
 									if (cn) {
 										String bans = prevbans + "(Temp) " + sender.getName() + " - " + a.toString() + ";";
-										Methods.editRow(Methods.con, "player_info", "bans='" + bans + "'", "player='" + args[2] + "'");
+										MySQL.editRow(MySQL.con, "player_info", "bans='" + bans + "'", "player='" + args[2] + "'");
 										sendMessage(sender, ChatColor.RED + args[2] + " has been banned " + bans.split(";").length + " times.");
 									} else {
 										String bans = "(Temp) " + sender.getName() + " - " + a.toString() + ";";
-										Methods.insertInfo(Methods.con, "player_info", "`player`,`warnings`,`bans`,`kicks`", "'" + args[2] + "',' ','" + bans + "',' '");
+										MySQL.insertInfo(MySQL.con, "player_info", "`player`,`warnings`,`bans`,`kicks`", "'" + args[2] + "',' ','" + bans + "',' '");
 									}
 									
 									for (Player p : Bukkit.getServer().getOnlinePlayers()) {
@@ -198,7 +198,7 @@ public class silent extends PalCommand {
 										return true;
 									}
 								}
-								ResultSet r = Methods.getRows(Methods.con, "perma_bans");
+								ResultSet r = MySQL.getRows(MySQL.con, "perma_bans");
 								boolean banned = false;
 								int id = 0;
 								try {
@@ -219,7 +219,7 @@ public class silent extends PalCommand {
 								} else {
 									OfflinePlayer playertwo = Bukkit.getServer().getOfflinePlayer(p2n);
 									if (global) {
-										Methods.insertInfo(Methods.con, "perma_bans", "`id`,`player`,`reason`,`staff`,`date`", id + ",'" + playertwo.getName() + "','" + banReason + "','" + sender.getName() + "','" + date + "'");
+										MySQL.insertInfo(MySQL.con, "perma_bans", "`id`,`player`,`reason`,`staff`,`date`", id + ",'" + playertwo.getName() + "','" + banReason + "','" + sender.getName() + "','" + date + "'");
 									} else{
 										plugin.reloadConfig();
 										playertwo.setBanned(true);
@@ -230,7 +230,7 @@ public class silent extends PalCommand {
 									if (playertwo.isOnline()) {
 										Bukkit.getServer().getPlayer(p2n).kickPlayer(banReason);
 									}
-									ResultSet pi = Methods.getRows(Methods.con, "player_info");
+									ResultSet pi = MySQL.getRows(MySQL.con, "player_info");
 									
 									
 									boolean cn = false;
@@ -247,11 +247,11 @@ public class silent extends PalCommand {
 									}
 									if (cn) {
 										String ban = bans + sender.getName() + " - " + banReason + ";";
-										Methods.editRow(Methods.con, "player_info", "bans='" + ban + "'", "player='" + p2n + "'");
+										MySQL.editRow(MySQL.con, "player_info", "bans='" + ban + "'", "player='" + p2n + "'");
 										sendMessage(sender, ChatColor.RED + p2n + " has been banned " + ((ban.split(";").length) > 2 ? ChatColor.DARK_RED : ChatColor.RED) + (ban.split(";").length) + " times.");
 									} else {
 										String ban = sender.getName() + " - " + banReason + ";";
-										Methods.insertInfo(Methods.con, "player_info", "`player`,`warnings`,`bans`,`kicks`", "'" + p2n + "',' ','" + ban + "',' '");
+										MySQL.insertInfo(MySQL.con, "player_info", "`player`,`warnings`,`bans`,`kicks`", "'" + p2n + "',' ','" + ban + "',' '");
 									}
 									for (Player p : Bukkit.getServer().getOnlinePlayers()) {
 										if (p.hasPermission("PalCraftEssentials.command.silent")) {
@@ -282,7 +282,7 @@ public class silent extends PalCommand {
 										sendMessage(sender, ChatColor.RED + "You can't kick " + args[1]);
 										return true;
 									} else {
-										ResultSet r = Methods.getRows(Methods.con, "player_info");
+										ResultSet r = MySQL.getRows(MySQL.con, "player_info");
 										boolean isInTable = false;
 										String prevKicks = "";
 										try{
@@ -304,10 +304,10 @@ public class silent extends PalCommand {
 										}
 										prevKicks += kick;
 										if (isInTable) {
-											Methods.editRow(Methods.con, "player_kicks", "player='" + args[1] + "'","kicks='" + prevKicks + kick + "'");
+											MySQL.editRow(MySQL.con, "player_kicks", "player='" + args[1] + "'","kicks='" + prevKicks + kick + "'");
 											sendMessage(sender, ChatColor.RED + args[1] + " has been kicked " + (prevKicks.split(";").length > 4 ? ChatColor.DARK_RED : "") + prevKicks.split(";").length + ChatColor.RED + " time" + (prevKicks.split(";").length > 1 ? "s" : "") + ".");
 										} else {
-											Methods.insertInfo(Methods.con, "player_kicks", "`player`,`warnings`,`bans`,`kicks`","'" + args[1] + "',' ',' ','" + kick + "'");
+											MySQL.insertInfo(MySQL.con, "player_kicks", "`player`,`warnings`,`bans`,`kicks`","'" + args[1] + "',' ',' ','" + kick + "'");
 										}
 										return true;
 									}
@@ -326,7 +326,7 @@ public class silent extends PalCommand {
 						if (args.length == 3) {
 							if (args[1].equalsIgnoreCase("player")) {
 								boolean banned = false;
-								ResultSet ra = Methods.getRows(Methods.con, "perma_bans");
+								ResultSet ra = MySQL.getRows(MySQL.con, "perma_bans");
 								int id = -1;
 								try {
 									while (ra.next()) {
@@ -338,7 +338,7 @@ public class silent extends PalCommand {
 								} catch (Exception e) {}
 								if (banned) {
 									Bukkit.getServer().getOfflinePlayer(args[2]).setBanned(false);
-									Methods.deleteRow(Methods.con, "perma_bans", id, "player = '" + args[2] + "'");
+									MySQL.deleteRow(MySQL.con, "perma_bans", id, "player = '" + args[2] + "'");
 									for (Player p : Bukkit.getServer().getOnlinePlayers()) {
 										if (p.hasPermission("PalCraftEssentials.command.silent")) {
 												p.sendMessage(ChatColor.DARK_RED + "Silent - " + sender.getName() +  ChatColor.RED+  ": " + "Unbanning " + args[2]);
@@ -359,7 +359,7 @@ public class silent extends PalCommand {
 								}
 							} else if (args[1].equalsIgnoreCase("ip")) {
 								boolean banned = false;
-								ResultSet r = Methods.getRows(Methods.con, "ip_bans");
+								ResultSet r = MySQL.getRows(MySQL.con, "ip_bans");
 								
 								try {
 									while (r.next()) {
@@ -385,7 +385,7 @@ public class silent extends PalCommand {
 										
 									}
 									if (id != -1){
-										Methods.deleteRow(Methods.con, "ip_bans", id, "ip = '" + args[2] + "'");
+										MySQL.deleteRow(MySQL.con, "ip_bans", id, "ip = '" + args[2] + "'");
 									}
 									for (Player p : Bukkit.getServer().getOnlinePlayers()) {
 										if (p.hasPermission("PalCraftEssentials.command.silent")) {
@@ -398,7 +398,7 @@ public class silent extends PalCommand {
 								}
 							} else if (args[1].equalsIgnoreCase("temp")) {
 								int id = -1;
-								ResultSet r = Methods.getRows(Methods.con, "temp_bans");
+								ResultSet r = MySQL.getRows(MySQL.con, "temp_bans");
 								
 								try {
 									while (r.next()) {
@@ -410,7 +410,7 @@ public class silent extends PalCommand {
 									
 								}
 								if (id != -1) {
-									Methods.deleteRow(Methods.con, "temp_bans", id, "player = '" + args[2] + "'");
+									MySQL.deleteRow(MySQL.con, "temp_bans", id, "player = '" + args[2] + "'");
 									for (Player p : Bukkit.getServer().getOnlinePlayers()) {
 										if (p.hasPermission("PalCraftEssentials.command.silent")) {
 												p.sendMessage(ChatColor.DARK_RED + "Silent - " + sender.getName() +  ChatColor.RED+  ": " + "Un temp-banning " + args[2]);

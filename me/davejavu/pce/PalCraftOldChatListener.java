@@ -66,7 +66,7 @@ public class PalCraftOldChatListener implements Listener {
 			}
 			
 			if (ig) {
-				ResultSet r = Methods.getRows(Methods.con, "troll");
+				ResultSet r = MySQL.getRows(MySQL.con, "troll");
 				List<String> se = new ArrayList<String>();
 				try{
 					while (r.next()) {

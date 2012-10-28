@@ -29,7 +29,7 @@ public class ban extends PalCommand {
 					String banReason;
 					if (args[0].equalsIgnoreCase("ip")) {
 						if (args[1].equalsIgnoreCase("-ip")) {
-							ResultSet r = Methods.getRows(Methods.con, "ip_bans");
+							ResultSet r = MySQL.getRows(MySQL.con, "ip_bans");
 							boolean banned = false;
 							int id = 0;
 							try {
@@ -46,7 +46,7 @@ public class ban extends PalCommand {
 							
 							if (!banned) {
 								Bukkit.getServer().banIP(args[2]);
-								Methods.insertInfo(Methods.con, "ip_bans", "`id`,`ip`,`staff`", id + ",'" + args[1] + "','" + sender.getName() + "'");
+								MySQL.insertInfo(MySQL.con, "ip_bans", "`id`,`ip`,`staff`", id + ",'" + args[1] + "','" + sender.getName() + "'");
 								Bukkit.getServer().broadcastMessage(ChatColor.DARK_RED + "[" + ChatColor.RED + sender.getName() + ChatColor.DARK_RED + "] " + ChatColor.RED + "Banning IP: " + ChatColor.WHITE + args[1]);
 								return true;
 							} else {
@@ -57,7 +57,7 @@ public class ban extends PalCommand {
 							if (getConfig(Bukkit.getOfflinePlayer(args[2])).getFC().contains("ip")) {
 								String ip = getConfig(Bukkit.getOfflinePlayer(args[2])).getFC().getString("playerip." + args[2].toLowerCase());
 								
-								ResultSet r = Methods.getRows(Methods.con, "ip_bans");
+								ResultSet r = MySQL.getRows(MySQL.con, "ip_bans");
 								boolean banned = false;
 								int id = 0;
 								try {
@@ -74,7 +74,7 @@ public class ban extends PalCommand {
 								
 								if (!banned) {
 									Bukkit.getServer().banIP(ip);
-									Methods.insertInfo(Methods.con, "ip_bans", "`id`,`ip`,`staff`", id + ",'" + args[1] + "','" + sender.getName() + "'");
+									MySQL.insertInfo(MySQL.con, "ip_bans", "`id`,`ip`,`staff`", id + ",'" + args[1] + "','" + sender.getName() + "'");
 									Bukkit.getServer().broadcastMessage(ChatColor.DARK_RED + "[" + ChatColor.RED + sender.getName() + ChatColor.DARK_RED + "] " + ChatColor.RED + "Banning IP: " + ChatColor.WHITE + ip);
 									return true;
 								} else {
@@ -92,7 +92,7 @@ public class ban extends PalCommand {
 						
 						
 					} else if (args[0].equalsIgnoreCase("temp")) {
-						ResultSet r = Methods.getRows(Methods.con, "temp_bans");
+						ResultSet r = MySQL.getRows(MySQL.con, "temp_bans");
 						boolean b = false;
 						int id = -1;
 						try{
@@ -116,8 +116,8 @@ public class ban extends PalCommand {
 							if (id == -1) {
 								id = 1;
 							}
-							Methods.insertInfo(Methods.con, "temp_bans", "`id`,`player`,`length`,`staff`,`reason`,`when`,`date`", id + ",'" + args[1] + "','" + args[2] + " " + args[3] + "','" + sender.getName() + "','" + a.toString() + "','" + String.valueOf(System.currentTimeMillis()) + "','" + date + "'");
-							ResultSet pi = Methods.getRows(Methods.con, "player_info");
+							MySQL.insertInfo(MySQL.con, "temp_bans", "`id`,`player`,`length`,`staff`,`reason`,`when`,`date`", id + ",'" + args[1] + "','" + args[2] + " " + args[3] + "','" + sender.getName() + "','" + a.toString() + "','" + String.valueOf(System.currentTimeMillis()) + "','" + date + "'");
+							ResultSet pi = MySQL.getRows(MySQL.con, "player_info");
 							boolean cn = false;
 							String prevbans = "";
 							try{
@@ -132,11 +132,11 @@ public class ban extends PalCommand {
 							}
 							if (cn) {
 								String bans = prevbans + "(Temp) " + sender.getName() + " - " + a.toString() + ";";
-								Methods.editRow(Methods.con, "player_info", "bans='" + bans + "'", "player='" + args[1] + "'");
+								MySQL.editRow(MySQL.con, "player_info", "bans='" + bans + "'", "player='" + args[1] + "'");
 								sendMessage(sender, ChatColor.RED + args[1] + " has been banned " + bans.split(";").length + " times.");
 							} else {
 								String bans = "(Temp) " + sender.getName() + " - " + a.toString() + ";";
-								Methods.insertInfo(Methods.con, "player_info", "`player`,`warnings`,`bans`,`kicks`", "'" + args[1] + "',' ','" + bans + "',' '");
+								MySQL.insertInfo(MySQL.con, "player_info", "`player`,`warnings`,`bans`,`kicks`", "'" + args[1] + "',' ','" + bans + "',' '");
 							}
 							
 							
@@ -148,7 +148,7 @@ public class ban extends PalCommand {
 						}
 						
 					} else if (args[0].equalsIgnoreCase("list")){
-						ResultSet r = Methods.getRows(Methods.con, "player_info");
+						ResultSet r = MySQL.getRows(MySQL.con, "player_info");
 						boolean ad = false;
 						String bn = "";
 						try{
@@ -176,7 +176,7 @@ public class ban extends PalCommand {
 							return true;
 						}
 					} else if (args[0].equalsIgnoreCase("reason")) {
-						ResultSet r = Methods.getRows(Methods.con, "perma_bans");
+						ResultSet r = MySQL.getRows(MySQL.con, "perma_bans");
 						boolean ad = false;
 						String reason = "";
 						try{
@@ -190,7 +190,7 @@ public class ban extends PalCommand {
 							
 						}
 						if (!ad) {
-							ResultSet r2 = Methods.getRows(Methods.con, "temp_bans");
+							ResultSet r2 = MySQL.getRows(MySQL.con, "temp_bans");
 							try{
 								while (r2.next()) {
 									if (r2.getString("player").equalsIgnoreCase(args[1])) {
@@ -211,7 +211,7 @@ public class ban extends PalCommand {
 						}
 						
 					} else if (args[0].equalsIgnoreCase("whobanned")) {
-						ResultSet r = Methods.getRows(Methods.con, "perma_bans");
+						ResultSet r = MySQL.getRows(MySQL.con, "perma_bans");
 						boolean ad = false;
 						String staff = "";
 						try{
@@ -225,7 +225,7 @@ public class ban extends PalCommand {
 							
 						}
 						if (!ad) {
-							ResultSet r2 = Methods.getRows(Methods.con, "temp_bans");
+							ResultSet r2 = MySQL.getRows(MySQL.con, "temp_bans");
 							try{
 								while (r2.next()) {
 									if (r2.getString("player").equalsIgnoreCase(args[1])) {
@@ -286,7 +286,7 @@ public class ban extends PalCommand {
 						} else {
 							banned = true;
 						}
-						ResultSet r = Methods.getRows(Methods.con, "perma_bans");
+						ResultSet r = MySQL.getRows(MySQL.con, "perma_bans");
 						int id = 0;
 						try {
 							while (r.next()) {
@@ -303,7 +303,7 @@ public class ban extends PalCommand {
 						} else {
 							OfflinePlayer playertwo = Bukkit.getServer().getOfflinePlayer(p2n);
 							if (global) {
-								Methods.insertInfo(Methods.con, "perma_bans", "`id`,`player`,`reason`,`staff`,`date`", id + ",'" + playertwo.getName() + "','" + banReason + "','" + sender.getName() + "','" + date + "'");
+								MySQL.insertInfo(MySQL.con, "perma_bans", "`id`,`player`,`reason`,`staff`,`date`", id + ",'" + playertwo.getName() + "','" + banReason + "','" + sender.getName() + "','" + date + "'");
 							} else{
 								CustomConfig config = reloadConfig();
 								playertwo.setBanned(true);
@@ -314,7 +314,7 @@ public class ban extends PalCommand {
 							if (playertwo.isOnline()) {
 								Bukkit.getServer().getPlayer(p2n).kickPlayer(banReason);
 							}
-							ResultSet pi = Methods.getRows(Methods.con, "player_info");
+							ResultSet pi = MySQL.getRows(MySQL.con, "player_info");
 							
 							
 							boolean cn = false;
@@ -331,11 +331,11 @@ public class ban extends PalCommand {
 							}
 							if (cn) {
 								String ban = bans + sender.getName() + " - " + banReason + ";";
-								Methods.editRow(Methods.con, "player_info", "bans='" + ban + "'", "player='" + p2n + "'");
+								MySQL.editRow(MySQL.con, "player_info", "bans='" + ban + "'", "player='" + p2n + "'");
 								sendMessage(sender, ChatColor.RED + p2n + " has been banned " + ((ban.split(";").length) > 2 ? ChatColor.DARK_RED : ChatColor.RED) + (ban.split(";").length) + " times.");
 							} else {
 								String ban = sender.getName() + " - " + banReason + ";";
-								Methods.insertInfo(Methods.con, "player_info", "`player`,`warnings`,`bans`,`bans`", "'" + p2n + "',' ','" + ban + "',' '");
+								MySQL.insertInfo(MySQL.con, "player_info", "`player`,`warnings`,`bans`,`bans`", "'" + p2n + "',' ','" + ban + "',' '");
 							}
 							
 							Bukkit.getServer().broadcastMessage(ChatColor.DARK_RED + "[" + ChatColor.RED + sender.getName() + ChatColor.DARK_RED + "] " + ChatColor.RED + "Banning " + p2n + ": " + ChatColor.WHITE + banReason);

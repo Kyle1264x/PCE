@@ -1,6 +1,7 @@
 package me.davejavu.pce;
 
 import java.io.File;
+import java.io.InputStream;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -17,6 +18,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
@@ -85,14 +87,14 @@ public class PalCraftEssentials extends JavaPlugin implements Listener {
 			log.log(Level.SEVERE, "MySQL info has not been inputted! Shutting down...");
 			getServer().getPluginManager().disablePlugin(this);
 		}
-		new Methods(host, port, database, username, password);
+		new MySQL(host, port, database, username, password);
 		log.info("[PalCraftEssentials] Startup finished! Took " + (System.currentTimeMillis() - firstTime) + " ms");
 	}
 	
 	public void onDisable() {
 		try {
 			//Close connection.
-			Methods.con.close();
+			MySQL.con.close();
 		} catch (SQLException e) {
 			log.log(Level.SEVERE, "Error closing the connection! Error: " + e.getCause());
 		}
@@ -194,5 +196,10 @@ public class PalCraftEssentials extends JavaPlugin implements Listener {
 			ret = "File could not be deleted";
 		}
 		return ret;
+	}
+	public YamlConfiguration loadResourceFromJar(String name) {
+		InputStream is = getResource("config.yml");
+		YamlConfiguration yc = YamlConfiguration.loadConfiguration(is);
+		return yc;
 	}
 }
