@@ -28,7 +28,7 @@ public class tp extends PalCommand {
 							sendMessage(sender, ChatColor.RED + "'" + args[0] + "' is not online!");
 							return true;
 						}
-						if (getConfig().getFC().getBoolean("players." + p2.getName().toLowerCase() + ".tp")) {
+						if (!getConfig(p2).getFC().getBoolean("tp")) {
 							sendMessage(sender, ChatColor.RED + "'" + p2.getDisplayName() + "' has teleportation disabled.");
 							return true;
 						}
@@ -51,11 +51,11 @@ public class tp extends PalCommand {
 							sendMessage(sender, ChatColor.RED + "'" + args[0] + "' is not online!");
 							return true;
 						}
-						if (plugin.getConfig().getBoolean("players." + p2.getName().toLowerCase() + ".tp")) {
+						if (!getConfig(p2).getFC().getBoolean("tp")) {
 							sendMessage(sender, ChatColor.RED + "'" + p2.getDisplayName() + "' has teleportation disabled.");
 							return true;
 						}
-						if (plugin.getConfig().getBoolean("players." + p3.getName().toLowerCase() + ".tp")) {
+						if (!getConfig(p3).getFC().getBoolean("tp")) {
 							sendMessage(sender, ChatColor.RED + "'" + p3.getDisplayName() + "' has teleportation disabled.");
 							return true;
 						}
