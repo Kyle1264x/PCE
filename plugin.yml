@@ -9,10 +9,15 @@ permissions:
         children:
             PalCraftEssentials.alt.view: true
             PalCraftEssentials.chat.colours: true
+            PalCraftEssentials.command.allplayers: true
             PalCraftEssentials.command.back: true
             PalCraftEssentials.command.ban: true
+            PalCraftEssentials.command.banip: true
             PalCraftEssentials.command.blockplayer: true
             PalCraftEssentials.command.blockcmd: true
+            PalCraftEssentials.command.bsearch: true
+            PalCraftEssentials.command.bupdate: true
+            PalCraftEssentials.command.censor: true
             PalCraftEssentials.command.clearinventory: true
             PalCraftEssentials.command.convert: true
             PalCraftEssentials.command.enchant: true
@@ -31,9 +36,11 @@ permissions:
             PalCraftEssentials.command.kick: true
             PalCraftEssentials.command.kickall: true
             PalCraftEssentials.command.more: true
+            PalCraftEssentials.command.setmotd: true
             PalCraftEssentials.command.msg: true
             PalCraftEssentials.command.msg.colours: true
             PalCraftEssentials.command.mute: true
+            PalCraftEssentials.command.pce: true
             PalCraftEssentials.command.playtime.self: true
             PalCraftEssentials.command.playtime.others: true
             PalCraftEssentials.command.repair: true
@@ -47,6 +54,7 @@ permissions:
             PalCraftEssentials.command.stalk: true
             PalCraftEssentials.command.superpick: true
             PalCraftEssentials.command.superpick.bedrock: true
+            PalCraftEssentials.command.tempban: true
             PalCraftEssentials.command.time: true
             PalCraftEssentials.command.tp: true
             PalCraftEssentials.command.tpa: true
@@ -76,153 +84,25 @@ permissions:
             PalCraftEssentials.sign.warp.use: true
             PalCraftEssentials.sign.warp.remove: true
     
-    
-    PalCraftEssentials.alt.view:
-        default: op
-    PalCraftEssentials.chat.colours:
-        default: op
-    PalCraftEssentials.command.back:
-        default: op
-    PalCraftEssentials.command.ban:
-        deafault: op
-    PalCraftEssentials.command.blockplayer:
-        default: true
-    PalCraftEseentials.command.blockcmd:
-        default: op
-    PalCraftEssentials.command.clearinventory:
-        default: op
-    PalCraftEssentials.command.convert:
-        default: op
-    PalCraftEssentials.command.delwarp:
-        default: op
-    PalCraftEssentials.command.enchant:
-        default: op
-    PalCraftEssentials.command.fly:
-        default: op
-    PalCraftEssentials.command.force:
-        default: op
-    PalCraftEssentials.command.freeze:
-        default: op
-    PalCraftEssentials.command.gamemode:
-        default: op
-    PalCraftEssentials.command.give:
-        default: op
-    PalCraftEssentials.command.god:
-        default: op
-    PalCraftEssentials.command.god.others:
-        default: op
-    PalCraftEssentials.command.heal:
-        default: op
-    PalCraftEssentials.command.heal.others:
-        default: op
-    PalCraftEssentials.command.home:
-        default: true
-    PalCraftEssentials.command.home.others:
-        default: op
-    PalCraftEssentials.command.item:
-        default: op
-    PalCraftEssentials.command.kick:
-        default: op
-    PalCraftEssentials.command.kickall:
-        default: op
-    PalCraftEssentials.command.more:
-        default: op
-    PalCraftEssentials.command.msg:
-        default: true
-    PalCraftEssentials.command.msg.colours:
-        default: true
-    PalCraftEssentials.command.mute:
-        default: op
-    PalCraftEssentials.command.playtime.self:
-        default: op
-    PalCraftEssentials.command.playtime.others:
-        default: op
-    PalCraftEssentials.command.repair:
-        default: op
-    PalCraftEssentials.command.serverinfo:
-        default: true
-    PalCraftEssentials.command.sethome:
-        default: true
-    PalCraftEssentials.command.setspawn:
-        default: op
-    PalCraftEssentials.command.setwarp:
-        default: op
-    PalCraftEssentials.command.silent:
-        default: op
-    PalCraftEssentials.command.socialspy:
-        default: op
-    PalCraftEssentials.command.speed:
-        default: op
-    PalCraftEssentials.command.stalk:
-        default: op
-    PalCraftEssentials.command.superpick:
-        default: op
-    PalCraftEssentials.command.superpick.bedrock:
-        default: op
-    PalCraftEssentials.command.time:
-        default: op
-    PalCraftEssentials.command.tp:
-        default: op
-    PalCraftEssentials.command.tpa:
-        default: true
-    PalCraftEssentials.command.tpaccept:
-        default: true
-    PalCraftEssentials.command.tpa:
-        default: true
-    PalCraftEssentials.command.tpdeny:
-        default: true
-    PalCraftEssentials.command.tphere:
-        default: op
-    PalCraftEssentials.command.tpo:
-        default: op
-    PalCraftEssentials.command.tpohere:
-        default: op
-    PalCraftEssentials.command.tptoggle:
-        default: op
-    PalCraftEssentials.command.troll:
-        default: op
-    PalCraftEssentials.command.unban:
-        default: op
-    PalCraftEssentials.command.vanish:
-        default: op
-    PalCraftEssentials.command.vanish.see:
-        default: op
-    PalCraftEssentials.command.warn:
-        default: op
-    PalCraftEssentials.command.warp:
-        default: op
-    PalCraftEssentials.command.warp.list:
-        default: op
-    PalCraftEssentials.command.warp.others:
-        default: op
-    PalCraftEssentials.command.weather:
-        default: op
-    PalCraftEssentials.command.whois:
-        default: op
-    PalCraftEssentials.exempt.ban:
-        default: op
-    PalCraftEssentials.exempt.kick:
-        default: op
-    PalCraftEssentials.geoip.view:
-        default: op
-    PalCraftEssentials.launchfireball:
-        default: op
-    PalCraftEssentials.sign.warp.use:
-        default: op
-    PalCraftEssentials.sign.warp.create:
-        default: op
-    PalCraftEssentials.sign.warp.remove:
-        default: op
-    
 commands:
+  allplayers:
+    description: All player stuff
   back:
     description: Teleport back
   ban:
-    description: Ban/tempban/ipban, also whobanned/banreason/prevbans
+    description: Ban, also whobanned/banreason/prevbans
+  banip:
+    description: Ban an IP
   blockplayer:
     description: blockplayer a player.
   blockcmd:
     description: blockplayer a players commands
+  bsearch:
+    description: Search the bans
+  bupdate:
+    description: Update a ban
+  censor:
+    description: Toggle censoring a players' messages
   clearinventory:
     description: Clear inventory
     aliases: [ci,clearinv]
@@ -271,11 +151,16 @@ commands:
     description: /me!
   more:
     description: Give more of the item in hand
+  setmotd:
+    description: Change the server motd
   msg:
     description: Message another player
     aliases: [tell,message,m,tell,t,pmsg]
   mute:
     description: Mute a player
+  pce:
+    description: PCE!
+    aliases: [palcraftessentials]
   playtime:
     description: See playtime.
   pvp:
@@ -295,13 +180,12 @@ commands:
   setwarp:
     description: Set a warp
     aliases: [sw]
-  silent:
-    description: Silent stuff.
-    aliases: [s]
   socialspy:
     description: Socialspy.
   spawn:
     description: Teleport to spawn
+  spawnwither:
+    description: Spawn wither
   speed:
     description: Change your running speed
   stalk:
@@ -309,6 +193,8 @@ commands:
   superpick:
     description: Super pickaxe.
     aliases: [/,psp]
+  tempban:
+    description: Tempban
   tp:
     description: Teleport
   tpa:

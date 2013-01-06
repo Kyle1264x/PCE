@@ -5,5 +5,24 @@ mysql:
   database: 'db_name'
   username: 'username'
   password: 'password'
+ftp:
+  enabled: false
+  host: "enter host"
+  username: 'username'
+  password: 'password'
+  port: 22
+backup-delay: 60
 players:
 chat-format: '{PREFIX} {NAME} {SUFFIX}&7: &f'
+wither-spawn: false
+blocked-piston-push:
+- 14
+- 15
+- 16
+- 21
+- 56
+- 73
+- 74
+- 129
+blocked-animal-spawn-worlds:
+blocked-potion-throw-worlds:
