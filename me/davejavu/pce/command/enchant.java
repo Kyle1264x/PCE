@@ -26,20 +26,30 @@ public class enchant extends PalCommand {
 				if (args.length > 1) {
 					if (sender instanceof Player) {
 						Player player = (Player) sender;
+						
+						
 						try{
 							Integer.parseInt(args[1]);
 						} catch (NumberFormatException e) {
 							sendMessage(sender, ChatColor.RED + "'" + args[1] + "' isn't a number!");
 							return true;
 						}
+						if (args[0].equalsIgnoreCase("all")) {
+							for (Enchantment c : Enchantment.values()) {
+								player.getItemInHand().addUnsafeEnchantment(c, Integer.parseInt(args[1]));
+							}
+							sendMessage(sender, ChatColor.GOLD + "Enchanted with " + ChatColor.RED + "EVERYTHING");
+							return true;
+						}
+						
 						try{
-							Enchantment.getByName(args[0]);
+							Enchantment.getByName(args[0].toUpperCase());
 						} catch (Exception e){
 							sendMessage(sender, ChatColor.RED + "'" + args[0] + "' isn't an enchantment!");
 							return true;
 						}
 						int level = Integer.parseInt(args[1]);
-						Enchantment en = Enchantment.getByName(args[0]);
+						Enchantment en = Enchantment.getByName(args[0].toUpperCase());
 						if (player.getItemInHand().getType() != Material.AIR) {
 							player.getItemInHand().addUnsafeEnchantment(en, level);
 							sendMessage(sender, ChatColor.GOLD + "Enchanted " + player.getItemInHand().getType().toString().toLowerCase() + " with " + args[0].toLowerCase() + ", level " + args[1]);
@@ -54,9 +64,9 @@ public class enchant extends PalCommand {
 				} else {
 					StringBuilder ench = new StringBuilder();
 					for (Enchantment c : Enchantment.values()) {
-						ench.append(c.getName()+" ");
+						ench.append(c.getName().toLowerCase()+", ");
 					}
-					sendMessage(sender, ChatColor.GOLD + "Enchant types: " + ChatColor.WHITE + ench.toString());
+					sendMessage(sender, ChatColor.GOLD + "Enchant types: " + ChatColor.WHITE + ench.toString().toLowerCase());
 					return true;
 				}
 			} else {

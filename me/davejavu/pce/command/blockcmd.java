@@ -39,7 +39,7 @@ public class blockcmd extends PalCommand {
 					player.sendMessage(ChatColor.GOLD + "Command block" + ChatColor.WHITE + ": " + (conf.getFC().getBoolean("block-commands.boolean") ? ChatColor.GREEN + "Enabled" : ChatColor.RED + "Disabled") + (args.length > 1 ? ChatColor.GOLD + " for " + ChatColor.WHITE + args[1] + " " + args[2] : ""));
 					return true;
 				} else {
-					sendMessage(sender, ChatColor.RED + "Usage: /freeze <player> [number] [sec/min/hour]");
+					sendMessage(sender, ChatColor.RED + "Usage: /blockcmd <player> [number] [sec/min/hour]");
 					return true;
 				}
 			} else {

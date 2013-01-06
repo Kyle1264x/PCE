@@ -13,6 +13,7 @@ import org.bukkit.entity.Player;
 
 import me.davejavu.pce.CustomConfig;
 import me.davejavu.pce.PalCommand;
+import me.davejavu.pce.PalCraftListener;
 
 public class vanish extends PalCommand {
 	public vanish(){}
@@ -43,12 +44,13 @@ public class vanish extends PalCommand {
 							sendMessage(sender, ChatColor.GOLD + "Vanish: " + ChatColor.WHITE + ": " + (isVanished(player) ? ChatColor.GREEN + "On" : ChatColor.RED + "Off"));
 							return true;
 						} else if (args[0].equalsIgnoreCase("fj") || args[0].equalsIgnoreCase("fakejoin")) {
-							Bukkit.broadcastMessage(ChatColor.YELLOW + player.getName() + " joined the game");
+							Bukkit.broadcastMessage(PalCraftListener.join(player));
 							setVanish(player, false);
 							warnPWP(player, false);
+							
 							return true;
 						} else if (args[0].equalsIgnoreCase("fq") || args[0].equalsIgnoreCase("fakequit")) {
-							Bukkit.broadcastMessage(ChatColor.YELLOW + player.getName() + " left the game");
+							Bukkit.broadcastMessage(PalCraftListener.quit(player));
 							setVanish(player, true);
 							warnPWP(player, true);
 							return true;

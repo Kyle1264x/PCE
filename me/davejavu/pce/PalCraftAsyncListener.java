@@ -1,23 +1,14 @@
 package me.davejavu.pce;
 
-import java.sql.ResultSet;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.util.logging.Level;
-
 import me.davejavu.pce.command.afk;
 import me.davejavu.pce.command.vanish;
 
-import org.anjocaido.groupmanager.GroupManager;
-import org.anjocaido.groupmanager.permissions.AnjoPermissionsHandler;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.plugin.Plugin;
@@ -40,21 +31,16 @@ public class PalCraftAsyncListener implements Listener {
 	public static String password = PalCommand.getConfig().getFC().getString("mysql.password");
 	public static String date = PalCraftEssentials.date;
 	
-	@EventHandler
+	@EventHandler(priority = EventPriority.HIGHEST)
 	public static void onPlayerChat(AsyncPlayerChatEvent evt) {
 		Player player = evt.getPlayer();
-		String name = player.getDisplayName();
+		//String name = player.getDisplayName();
 		String message = evt.getMessage();
 		
 		//Update activity - show's the player is still active
 		afk.updateActivity(player);
 		
-		//A troll thing.
-		if (PalCraftListener.moo.contains(player.getName().toLowerCase())) {
-			name = "Cow";
-			message = "moo";
-			player.getLocation().getWorld().spawnEntity(player.getLocation(), EntityType.COW);
-		}
+		
 		
 		//If the player's vanish chat block is enabled, it will cancel the event.
 		if (!vanish.canChat(player)) {
@@ -63,15 +49,15 @@ public class PalCraftAsyncListener implements Listener {
 		
 		//Just some random troll stuff I did a while ago.
 		if (!evt.getMessage().contains("grief")) {
-			boolean ig = false;
-			for (String pl : PalCraftListener.gag) {
+			//boolean ig = false;
+			/*for (String pl : PalCraftListener.gag) {
 				if (player.getName().equalsIgnoreCase(Bukkit.getServer().getPlayer(pl).getName())) {
 					ig = true;
 				}
 			}
 			
 			if (ig) {
-				ResultSet r = MySQL.getRows(MySQL.con, "troll");
+				ResultSet r = MySQL.getAllRows(MySQL.con, "troll");
 				List<String> se = new ArrayList<String>();
 				try{
 					while (r.next()) {
@@ -91,6 +77,7 @@ public class PalCraftAsyncListener implements Listener {
 					message = nMsg;
 				}
 			}
+			*/
 		}
 		
 		//Mute - if they're muted they cannot talk.
@@ -111,28 +98,17 @@ public class PalCraftAsyncListener implements Listener {
 					evt.setCancelled(true);
 				}
 			}
-			
 		}
 		//Replaces colour codes with colours if they have permission, example: &1 = blue etc
 		if (PalCommand.permissionCheck((CommandSender)player,"PalCraftEssentials.chat.colours")) {
 			message = message.replaceAll("&([0-9a-rA-R])", "§$1");
 		}
-		//Enables the use of GM prefixes/suffixes
-		if (Bukkit.getPluginManager().isPluginEnabled("GroupManager")) {
-			GroupManager gm = (GroupManager) Bukkit.getPluginManager().getPlugin("GroupManager");
-			if (gm != null) {
-				AnjoPermissionsHandler handler = gm.getWorldsHolder().getWorldPermissions(player);
-				if (handler == null) {
-					PalCraftEssentials.log.log(Level.SEVERE, "Handler == null!");
-				} else {
-					String gmPrefix = handler.getUserPrefix(player.getName()).replaceAll("&([0-9a-rA-R])", "§$1");
-					String gmSuffix = handler.getUserSuffix(player.getName()).replaceAll("&([0-9a-rA-R])", "§$1");
-					String fm = "%s%s%s" + ChatColor.GRAY + ": " + ChatColor.WHITE + "%s";
-					evt.setFormat(String.format(fm, gmPrefix, name, gmSuffix, ChatColor.WHITE + message));
-				}
-			} else {
-				PalCraftEssentials.log.log(Level.SEVERE, "GM == null!");
-			}
-		}
+		//A troll thing.
+		/*if (PalCraftListener.moo.contains(player.getName().toLowerCase())) {
+			name = "Cow";
+			message = "moo";
+			player.getLocation().getWorld().spawnEntity(player.getLocation(), EntityType.COW);
+		}*/
+		evt.setMessage(message);
 	}
 }

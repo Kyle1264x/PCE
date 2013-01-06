@@ -13,8 +13,14 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 
 public abstract class PalCommand implements CommandExecutor {
+	
+	
+	public PalCommand(){}
+	public PalCommand(Plugin plugin){}
+	
 	public abstract boolean onCommand(CommandSender sender, Command cmd, String cmdLabel, String[] args);
 	
 	
@@ -59,7 +65,7 @@ public abstract class PalCommand implements CommandExecutor {
 	//it will check if there it can match a player with that name through Bukkit's method.
 	//Then, it will return p2, whether it's null or not.
 	//All I have to do in the class is check if the player returned is null, if it is then they're not online.
-	public Player getPlayer(String name) {
+	public static Player getPlayer(String name) {
 		Player p2 = null;
 		for (Player p : Bukkit.getOnlinePlayers()) {
 			if (p.getDisplayName().toLowerCase().contains(name.toLowerCase())) {

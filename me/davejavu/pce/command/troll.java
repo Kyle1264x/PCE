@@ -27,6 +27,7 @@ public class troll extends PalCommand {
 		this.plugin = plugin;
 	}
 	public troll(){}
+	@SuppressWarnings("deprecation")
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd,
 			String cmdLabel, String[] args) {
@@ -260,19 +261,33 @@ public class troll extends PalCommand {
 						}
 					case "spam":
 						if (args.length == 2){
-							List<Player> p2l = Bukkit.getServer().matchPlayer(args[1]);
+							final List<Player> p2l = Bukkit.getServer().matchPlayer(args[1]);
 							if (!(p2l.size() > 0)) {
 								sendMessage(sender, ChatColor.RED + "Player is not online!");
 								return true;
 							}
-							Player p2 = p2l.get(0);
-							for (int i = 0; i < 50; i++) {
-								Random r = new Random();
-								ChatColor[] cl = ChatColor.values();
-								ChatColor x = cl[r.nextInt(cl.length)];
-								p2.sendMessage(x + "SPAM SPAM SPAM SPAM SPAM SPAM SPAM SPAM SPAM" + ChatColor.RESET);
-								p2.getWorld().playEffect(p2.getLocation(), Effect.EXTINGUISH, 0);
-							}
+							
+							final Thread spamThread = new Thread(new Runnable() {
+								public void run() {
+									Player p2 = p2l.get(0);
+									for (int i = 0; i < 50; i++) {
+										Random r = new Random();
+										ChatColor[] cl = ChatColor.values();
+										ChatColor x = cl[r.nextInt(cl.length)];
+										p2.sendMessage(x + "SPAM SPAM SPAM SPAM SPAM SPAM SPAM SPAM SPAM" + ChatColor.RESET);
+										p2.getWorld().playEffect(p2.getLocation(), Effect.EXTINGUISH, 0);
+										try {
+											Thread.sleep(25);
+										} catch (InterruptedException e) {
+											e.printStackTrace();
+										}
+									}
+								}
+							});
+							spamThread.run();
+							spamThread.destroy();
+							
+							
 							sendMessage(sender, ChatColor.GOLD + "Troll successful.");
 							return true;
 						} else {

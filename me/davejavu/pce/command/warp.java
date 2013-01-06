@@ -1,6 +1,7 @@
 package me.davejavu.pce.command;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.bukkit.ChatColor;
@@ -91,6 +92,7 @@ public class warp extends PalCommand {
 	public List<String> listWarps(int page) {
 		List<String> ret = new ArrayList<String>();
 		List<String> wL = PalCraftEssentials.listWarps();
+		Collections.sort(wL);
 		int end = (page * 50);
 		int start = end - 50 + 1;
 		for (int s = start; s < (end - 1); s++) {

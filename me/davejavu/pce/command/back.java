@@ -13,7 +13,8 @@ import me.davejavu.pce.PalCommand;
 
 public class back extends PalCommand {
 	
-	public back(){}
+	public back(){
+	}
 	
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd,

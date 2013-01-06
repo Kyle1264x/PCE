@@ -5,25 +5,39 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.logging.Level;
 
 public class MySQL {
 	public static Connection con;
-	
+
 	public MySQL(String host, String port, String database, String username, String password) {
 		con = mysqlConnect(host, port,database, username, password);
 	}
-	
+
 	//This is the method that connects to the MySQL database,
 	//All other methods need the connection to be able to get/add/change info etc
 	//The most efficient way of doing so is to open a connection when the plugin is enabled, onEnable(),
 	//then use it in all commands as to not create dozens upon dozens of connections,
 	//Finally closing it in onDisable()
 	//(thanks seru)
-	
+
 	public static Connection getCon() {
 		return con;
 	}
-	
+
+	public static ResultSet executeCommand(String command) {
+		try {
+			Statement s = con.createStatement();
+			ResultSet r = s.executeQuery(command);
+			return r;
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return null;
+
+	}
+
+
 	public static Connection mysqlConnect(String host, String port, String database, String username, String password) {
 		Connection conc = null;
 		try{
@@ -33,9 +47,9 @@ public class MySQL {
 			e.printStackTrace();
 		}
 		return conc;
-		
+
 	}
-	
+
 	//Inserts information into the table specified
 	//here's an exampls:
 	//insertInfo(con, "bans","`player`,`reason`","'davejavu','being too good at life'");
@@ -53,10 +67,10 @@ public class MySQL {
 			e.printStackTrace();
 		}
 	}
-	
+
 	//Returns all rows in the specified table by executing a simple
 	//query
-	public static ResultSet getRows(Connection con, String tablename) {
+	public static ResultSet getAllRows(Connection con, String tablename) {
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
 		} catch (ClassNotFoundException e) {
@@ -66,12 +80,27 @@ public class MySQL {
 			Statement st = con.createStatement();
 			result = st.executeQuery("SELECT * FROM " + tablename);
 			return result;
-			
+
 		}catch(Exception e){
 		}
 		return result;
 	}
-	
+
+	public static ResultSet getRow(Connection con, String table, String info) {
+		try {
+			Class.forName("com.mysql.jdbc.Driver");
+		} catch (ClassNotFoundException e) {
+		}
+		ResultSet result = null;
+		try{
+			Statement st = con.createStatement();
+			result = st.executeQuery("SELECT * FROM " + table + " WHERE " + info);
+			return result;
+		}catch(Exception e){
+		}
+		return result;
+	}
+
 	//Deletes all rows in the specified table
 	public static void deleteAllRows(Connection con, String tablename){
 		try {
@@ -86,7 +115,7 @@ public class MySQL {
 			e.printStackTrace();
 		}
 	}
-	
+
 	//Deletes the row where id is the variable "id"
 	//"other" just defines any other information, e.g could be player = 'derp'
 	public static void deleteRow(Connection con, String tablename, int id, String other){
@@ -118,6 +147,21 @@ public class MySQL {
 			e.printStackTrace();
 		}
 	}
+
+	public static void createTable(Connection con, String newTableName, String columns) {
+		try{
+			Class.forName("com.mysql.jdbc.Driver");
+			Statement st = con.createStatement();
+			String ud = "CREATE TABLE `" + newTableName + "` (" + columns + ")";
+			st.execute(ud);
+		} catch (Exception e) {
+			PalCraftEssentials.log.log(Level.SEVERE, "Error while creating table " + newTableName);
+			e.printStackTrace();
+		}
+	}
 	
-	
+	public static void addToTable(String table, String info) {
+		
+	}
+
 }

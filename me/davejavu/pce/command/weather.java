@@ -31,9 +31,9 @@ public class weather extends PalCommand {
 					changeWeatherIn = Bukkit.getWorlds().get(0);
 				}
 				if (args[0].equalsIgnoreCase("sun")) {
-					changeWeatherIn.setWeatherDuration(0);
+					changeWeatherIn.setWeatherDuration(2);
 				} else if (args[0].equalsIgnoreCase("rain")) {
-					changeWeatherIn.setWeatherDuration(0);
+					changeWeatherIn.setWeatherDuration(2);
 				} else if (args[0].equalsIgnoreCase("thunder")) {
 					changeWeatherIn.setThundering(true);
 				} else {

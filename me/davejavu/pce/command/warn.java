@@ -23,28 +23,27 @@ public class warn extends PalCommand {
 		if (cmd.getName().equalsIgnoreCase("warn")) {
 			if (permissionCheck(sender, "command.warn")) {
 				if (args.length > 1) {
-					if (args[0].equalsIgnoreCase("add")) {
-						ResultSet r = MySQL.getRows(MySQL.con, "player_info");
-						boolean ad = false;
-						String warnings = "";
-						try{
-							while (r.next()) {
-								if (args[1].equalsIgnoreCase(r.getString("player"))) {
-									ad = true;
-									warnings = r.getString("warnings");
-								}
+					ResultSet r = MySQL.getRow(MySQL.con, "player_info", "player='" + Bukkit.getPlayer(args[1]).getName() + "'");
+					boolean ad = false;
+					String wn = "";
+					try{
+						while (r.next()) {
+							if (args[1].equalsIgnoreCase(r.getString("player"))) {
+								ad = true;
+								wn = r.getString("warnings");
 							}
-						} catch (Exception e) {
-							
 						}
-						StringBuilder wn = new StringBuilder();
+					} catch (Exception e) {
+					}
+					if (args[0].equalsIgnoreCase("add")) {
+						StringBuilder wna = new StringBuilder();
 						for (int i = 2; i < args.length; i++) {
-							wn.append(args[i] + " ");
+							wna.append(args[i] + " ");
 						}
 						if (ad) {
-							String warn = warnings + sender.getName() + " - " +  wn.toString() + ";";
+							String warn = wn + sender.getName() + " - " +  wn.toString() + ";";
 							MySQL.editRow(MySQL.con, "player_info", "warnings='" + warn + "'", "player='" + args[1] + "'");
-							sendMessage(sender, ChatColor.RED + "Warned " + args[1] + ChatColor.DARK_RED + " (" + warn.split(";").length + ")" + ChatColor.RED + ": " + ChatColor.WHITE + wn.toString());
+							sendMessage(sender, ChatColor.RED + "Warned " + args[1] + ChatColor.DARK_RED + " (" + warn.split(";").length + ")" + ChatColor.RED + ": " + ChatColor.WHITE + wna.toString());
 							if (warn.split(";").length > 4) {
 								String reason = "You have 5 warnings!";
 								Bukkit.getServer().broadcastMessage(ChatColor.RED + "[" + ChatColor.DARK_RED + sender.getName() + ChatColor.RED + "] Banning " + args[1] + ": " + ChatColor.WHITE + reason);
@@ -67,18 +66,7 @@ public class warn extends PalCommand {
 							return true;
 						}
 					} else if (args[0].equalsIgnoreCase("list")) {
-						ResultSet r = MySQL.getRows(MySQL.con, "player_info");
-						boolean ad = false;
-						String wn = "";
-						try{
-							while (r.next()) {
-								if (args[1].equalsIgnoreCase(r.getString("player"))) {
-									ad = true;
-									wn = r.getString("warnings");
-								}
-							}
-						} catch (Exception e) {
-						}
+						
 						if (ad && !wn.equalsIgnoreCase(" ")) {
 							int c = 1;
 							sendMessage(sender, ChatColor.RED + args[1] + " has " + ChatColor.DARK_RED + wn.split(";").length + ChatColor.RED + " warnings:");
@@ -93,19 +81,6 @@ public class warn extends PalCommand {
 							return true;
 						}
 					} else if (args[0].equalsIgnoreCase("remove")) {
-						ResultSet r = MySQL.getRows(MySQL.con, "player_info");
-						boolean ad = false;
-						String wn = "";
-						try{
-							while (r.next()) {
-								if (args[1].equalsIgnoreCase(r.getString("player"))) {
-									ad = true;
-									wn = r.getString("warnings");
-								}
-							}
-						} catch (Exception e) {
-							
-						}
 						if (ad && !wn.equalsIgnoreCase(" ")) {
 							if (args[2].equalsIgnoreCase("all")) {
 								MySQL.editRow(MySQL.con, "player_info", "warnings=' '", "player='" + args[1] + "'");

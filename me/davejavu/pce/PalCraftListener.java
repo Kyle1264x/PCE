@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.logging.Logger;
 
+import me.davejavu.davechat.DaveListener;
 import me.davejavu.pce.command.afk;
 import me.davejavu.pce.command.back;
 import me.davejavu.pce.command.vanish;
@@ -25,6 +26,7 @@ import org.bukkit.block.Sign;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.SmallFireball;
 import org.bukkit.event.EventHandler;
@@ -33,15 +35,20 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockDamageEvent;
+import org.bukkit.event.block.BlockPistonExtendEvent;
+import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.SignChangeEvent;
+import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
@@ -57,37 +64,83 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.util.Vector;
 
 public class PalCraftListener implements Listener {
-	
+
 	static Plugin plugin;
-	
+
 	public PalCraftListener(PalCraftEssentials plugin) {
 		PalCraftListener.plugin = plugin;
 	}
 	public static boolean ultramute = false;
-	
+
 	public static String[] commands;
-	
+
 	public static List<String> moo = new ArrayList<String>();
 	public static List<String> gag = new ArrayList<String>();
-	
+
 	public static HashMap<String, Long> play = new HashMap<String, Long>();
 	public static HashMap<String, Integer> stalk = new HashMap<String, Integer>();
 	public static HashMap<String, Boolean> kick = new HashMap<String, Boolean>();
-	
+
 	public static List<String> online = new ArrayList<String>();
-	
+
 	Logger log = Logger.getLogger("Minecraft");
-	
+
 	public static String host = PalCommand.getConfig().getFC().getString("mysql.host");
 	public static String port = PalCommand.getConfig().getFC().getString("mysql.port");
 	public static String database = PalCommand.getConfig().getFC().getString("mysql.database");
 	public static String username = PalCommand.getConfig().getFC().getString("mysql.username");
 	public static String password = PalCommand.getConfig().getFC().getString("mysql.password");
 	public static String date = PalCraftEssentials.date;
-	
+
 	public static HashMap<String, String> fOW = new HashMap<String, String>();
 	public static HashMap<String, String> tempDeathStorage = new HashMap<String, String>();
-	
+
+	@EventHandler
+	public void onCreatureSpawn(CreatureSpawnEvent evt) {
+		if (PalCommand.getConfig().getFC().getStringList("blocked-animal-spawn-worlds").contains(evt.getEntity().getWorld().getName())) {
+			evt.setCancelled(true);
+		}
+	}
+
+	@EventHandler
+	public void onPotion(PotionSplashEvent evt) {
+		if (PalCommand.getConfig().getFC().getStringList("blocked-potion-throw-worlds").contains(evt.getEntity().getWorld().getName())) {
+			log.info("[PCE-BLOCK] " + ((Player)evt.getPotion().getShooter()).getName() + " tried to throw a potion!");
+			evt.setCancelled(true);
+		}
+	}
+
+	@EventHandler
+	public void onItemHeldChange(PlayerItemHeldEvent evt) {
+		if (PalCommand.getConfig().getFC().getStringList("blocked-animal-spawn-worlds").contains(evt.getPlayer().getWorld().getName())) {
+			if (evt.getPlayer().getInventory().getItemInHand().getTypeId() == 373 || evt.getPlayer().getInventory().getItemInHand().getTypeId() == 383 || evt.getPlayer().getInventory().getItemInHand().getTypeId() == 384) {
+				log.info("[PCE-BLOCK] " + evt.getPlayer().getName() + " tried to hold " + evt.getPlayer().getInventory().getItemInHand().getType().toString().toLowerCase());
+				evt.getPlayer().getInventory().setItemInHand(new ItemStack(Material.AIR));
+			}
+		}
+	}
+
+	@EventHandler
+	public void onPistonPush(BlockPistonExtendEvent evt) {
+		for (Block bl : evt.getBlocks()) {
+			boolean iB = isBlockedToPush(bl);
+			if (iB) {
+				evt.setCancelled(true);
+				break;
+			}
+		}
+
+	}
+
+	@EventHandler
+	public void onPistonRetract(BlockPistonRetractEvent evt) {
+		Block block = evt.getBlock().getWorld().getBlockAt(evt.getRetractLocation());
+		boolean iB = isBlockedToPush(block);
+		if (iB) {
+			evt.setCancelled(true);
+		}
+	}
+
 	@EventHandler
 	public void onSignChange(SignChangeEvent evt) {
 		Player player = evt.getPlayer();
@@ -105,9 +158,9 @@ public class PalCraftListener implements Listener {
 				player.sendMessage(ChatColor.RED + "No permission to place " + ChatColor.WHITE + "warp" + ChatColor.RED + " sign");
 			}
 		}
-		
+
 	}
-	
+
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onPlayerLogin(PlayerLoginEvent evt) {
 		Player player = evt.getPlayer();
@@ -129,12 +182,12 @@ public class PalCraftListener implements Listener {
 				evt.setResult(Result.KICK_BANNED);
 				evt.setKickMessage("A MySQL error occurred - try again later.");
 			}
-			
+
 		} else {
 			player.sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "You were banned! (You are exempt)");
 		}
 	}
-	
+
 	@EventHandler
 	public void onBlockDamage(BlockDamageEvent evt) {
 		Player player = evt.getPlayer();
@@ -146,7 +199,7 @@ public class PalCraftListener implements Listener {
 			}
 		}
 	}
-	
+
 	@EventHandler
 	public void onPlayerClick(PlayerInteractEvent evt) {
 		Player player = evt.getPlayer();
@@ -158,31 +211,31 @@ public class PalCraftListener implements Listener {
 			i.setContents(chest.getInventory().getContents());
 			player.openInventory(i);
 			player.sendMessage(ChatColor.GOLD + "Opening chest silently - no editing.");
-			
+
 			return;
 		}
 		try{
-		if (((evt.getAction() == Action.RIGHT_CLICK_BLOCK) && (evt.getClickedBlock().getType() == Material.SIGN) || (evt.getClickedBlock().getType() == Material.SIGN_POST) || (evt.getClickedBlock().getType() == Material.WALL_SIGN))) {
-			if (evt.getAction() != Action.LEFT_CLICK_BLOCK) {
-				Sign s = (Sign)evt.getClickedBlock().getState();
-				String l1 = s.getLine(0);
-				String l2 = s.getLine(1);
-				if (l1.equals(ChatColor.AQUA + "[Warp]")) {
-					if (player.hasPermission("PalCraftEssentials.sign.warp.use")) {
-						Location loc = PalCraftEssentials.getWarp(l2);
-						if (loc == null) {
-							player.sendMessage(ChatColor.RED + "Warp '" + ChatColor.WHITE + l2 + ChatColor.RED + "' doesn't exist!");
+			if (((evt.getAction() == Action.RIGHT_CLICK_BLOCK) && (evt.getClickedBlock().getType() == Material.SIGN) || (evt.getClickedBlock().getType() == Material.SIGN_POST) || (evt.getClickedBlock().getType() == Material.WALL_SIGN))) {
+				if (evt.getAction() != Action.LEFT_CLICK_BLOCK) {
+					Sign s = (Sign)evt.getClickedBlock().getState();
+					String l1 = s.getLine(0);
+					String l2 = s.getLine(1);
+					if (l1.equals(ChatColor.AQUA + "[Warp]")) {
+						if (player.hasPermission("PalCraftEssentials.sign.warp.use")) {
+							Location loc = PalCraftEssentials.getWarp(l2);
+							if (loc == null) {
+								player.sendMessage(ChatColor.RED + "Warp '" + ChatColor.WHITE + l2 + ChatColor.RED + "' doesn't exist!");
+								return;
+							}
+							player.teleport(loc);
+						} else {
+							player.sendMessage(ChatColor.RED + "No permission for " + ChatColor.WHITE + "warp" + ChatColor.RED + " sign");
 							return;
 						}
-						player.teleport(loc);
-					} else {
-						player.sendMessage(ChatColor.RED + "No permission for " + ChatColor.WHITE + "warp" + ChatColor.RED + " sign");
-						return;
+
 					}
-					
 				}
 			}
-		}
 		}catch (Exception e){}
 		if (stalk.containsKey(player.getName())) {
 			int p = stalk.get(player.getName()) + 1;
@@ -198,9 +251,9 @@ public class PalCraftListener implements Listener {
 				player.getWorld().spawn(playerLoc, SmallFireball.class);
 			}
 		}
-		
+
 	}
-	
+
 	@EventHandler
 	public void onShear(PlayerShearEntityEvent evt) {
 		Player player = evt.getPlayer();
@@ -209,7 +262,7 @@ public class PalCraftListener implements Listener {
 			evt.setCancelled(true);
 		}
 	}
-	
+
 	@EventHandler
 	public void onItemPickup(PlayerPickupItemEvent evt) {
 		Player player = evt.getPlayer();
@@ -218,7 +271,7 @@ public class PalCraftListener implements Listener {
 			evt.setCancelled(true);
 		}
 	}
-	
+
 	@EventHandler
 	public void onItemDrop(PlayerDropItemEvent evt) {
 		Player player = evt.getPlayer();
@@ -227,7 +280,7 @@ public class PalCraftListener implements Listener {
 			evt.setCancelled(true);
 		}
 	}
-	
+
 	@EventHandler
 	public void onPlayerDeath(PlayerDeathEvent evt) {
 		//Set back location to death location
@@ -241,17 +294,26 @@ public class PalCraftListener implements Listener {
 			}
 			fOW.put(player.getName().toLowerCase(), tempDeathStorage.get(player.getName().toLowerCase()));
 		}
+		/*if (evt.getDeathMessage().contains("was slain by")) {
+			OfflinePlayer p2o = Bukkit.getOfflinePlayer(evt.getDeathMessage().split("was slain by")[1]);
+			if (p2o.isOnline()) {
+				ItemStack killedWith = p2o.getPlayer().getItemInHand();
+				evt.setDeathMessage(ChatColor.RED + evt.getEntity().getDisplayName() + ChatColor.DARK_RED + " was killed by " + ChatColor.RED + p2o.getPlayer().getDisplayName() + ChatColor.DARK_RED + " with a " + ChatColor.RED + killedWith.getType().toString().toLowerCase());
+			} else {
+				evt.setDeathMessage(ChatColor.RED + evt.getEntity().getDisplayName() + ChatColor.DARK_RED + " was killed by " + ChatColor.RED + p2o.getPlayer().getDisplayName());
+			}
+		}*/
 	}
-	
-	
-	
+
+
+
 	@EventHandler
 	public void onPlayerTeleport(PlayerTeleportEvent evt) {
 		if ((evt.getCause() == TeleportCause.PLUGIN || evt.getCause() == TeleportCause.COMMAND)) {
 			back.setBack(evt.getPlayer(), evt.getFrom());
 		}
 	}
-	
+
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void onPlayerJoin(PlayerJoinEvent evt){
 		plugin.reloadConfig();
@@ -260,62 +322,48 @@ public class PalCraftListener implements Listener {
 		//the playtime in their config will be updated as to give the most
 		//accurate playtime, down to seconds.
 		play.put(player.getName().toLowerCase(), System.currentTimeMillis());
-		
-		
+
+
 		if (!player.hasPermission("PalCraftEssentials.command.stalk")) {
 			online.add(player.getName());
 		}
-
 		CustomConfig playerCustomConfig = new CustomConfig("./plugins/PalCraftEssentials/players", player.getName().toLowerCase());
 		FileConfiguration fc = playerCustomConfig.getFC();
-		StringBuilder whatIsReset = new StringBuilder();
 		if (!fc.contains("firstplayed")) {
 			fc.set("firstplayed", date);
-			whatIsReset.append("firstplayed, ");
 		}
 		if (!fc.contains("mute.boolean")) {
 			fc.set("mute.boolean", false);
-			whatIsReset.append("mute.boolean, ");
 		}
 		if (!fc.contains("mute.time")) {
 			fc.set("mute.time", 0L);
-			whatIsReset.append("mute.time, ");
 		}
 		if (!fc.contains("playtime")) {
 			fc.set("playtime", 0L);
-			whatIsReset.append("playtime, ");
 		}
 		if (!fc.contains("god")) {
 			fc.set("god", false);
-			whatIsReset.append("god, ");
 		}
 		if (!fc.contains("pvp")) {
 			fc.set("pvp", false);
-			whatIsReset.append("pvp, ");
 		}
 		if (!fc.contains("tp")) {
 			fc.set("tp", false);
-			whatIsReset.append("tp, ");
 		}
 		if (!fc.contains("socialspy")) {
 			fc.set("socialspy", false);
-			whatIsReset.append("socialspy, ");
 		}
 		if (!fc.contains("vanish.boolean")) {
 			fc.set("vanish.boolean", false);
-			whatIsReset.append("vanish.boolean, ");
 		}
 		if (!fc.contains("vanish.interact")) {
 			fc.set("vanish.interact", true);
-			whatIsReset.append("vanish.interact, ");
 		}
 		if (!fc.contains("vanish.chat")) {
 			fc.set("vanish.chat", true);
-			whatIsReset.append("vanish.chat, ");
 		}
 		if (!fc.contains("block-list")) {
 			fc.set("block-list", new ArrayList<String>());
-			whatIsReset.append("block-list, ");
 		}
 		if (!fc.contains("back.world")) {
 			fc.set("back.world", player.getWorld().getName());
@@ -324,29 +372,26 @@ public class PalCraftListener implements Listener {
 			fc.set("back.z", Double.parseDouble("3"));
 			fc.set("back.yaw", Float.parseFloat("3"));
 			fc.set("back.pitch", Float.parseFloat("3"));
-			whatIsReset.append("back, ");
 		}
 		if (!fc.contains("ip")) {
 			fc.set("ip", player.getAddress().getHostString());
-			whatIsReset.append("ip, ");
 		}
 		if (!fc.contains("superpick")) {
 			fc.set("superpick", false);
-			whatIsReset.append("superpick, ");
 		}
 		if (!fc.contains("block-commands.boolean")) {
 			fc.set("block-commands.boolean", false);
 			fc.set("block-commands.time", 0L);
-			whatIsReset.append("block-commands, ");
 		}
 		if (!fc.contains("afk")) {
 			fc.set("afk", false);
 		}
+		if (!fc.contains("censor")) {
+			fc.set("censor", false);
+		}
 		playerCustomConfig.save();
-		if (whatIsReset != new StringBuilder()) 
-			player.sendMessage("Forced to reset: " + whatIsReset.toString());
 
-		
+
 		play.put(player.getName().toLowerCase(), System.currentTimeMillis());
 		if (!plugin.getConfig().contains("playtime." + player.getName().toLowerCase())) {
 			plugin.getConfig().set("playtime." + player.getName().toLowerCase(), Long.parseLong("0"));
@@ -386,13 +431,16 @@ public class PalCraftListener implements Listener {
 			ipConfig.getFC().set("ip." + ip, player.getName() + ";");
 			ipConfig.save();
 		}
-		
+
 		DateFormat dF = new SimpleDateFormat("dd/MM/yyyy");
 		Date date = new Date();
 		player.sendMessage(ChatColor.GOLD + "The date is: " + ChatColor.WHITE + dF.format(date));
 		String[] d = dF.format(date).split("/");
 		if (Integer.parseInt(d[0]) == 1 && Integer.parseInt(d[1]) == 8) {
 			player.sendMessage(ChatColor.GOLD + "Don't forget - it's Daves birthday!! :D");
+		}
+		if (dF.format(date).startsWith("25/12/")) {
+			player.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + "MERRY CHRISTMAS!");
 		}
 		CustomConfig pc = PalCommand.getConfig(player);
 		if (pc.getFC().getBoolean("vanish")) {
@@ -406,8 +454,8 @@ public class PalCraftListener implements Listener {
 				pc.getFC().set("vanish.interact", false);
 				pc.save();
 				evt.setJoinMessage(null);
-				
-				
+
+
 				for (Player p : Bukkit.getOnlinePlayers()) {
 					if (p.hasPermission("PalCraftEssentials.command.vanish")) {
 						p.sendMessage(ChatColor.DARK_AQUA + player.getName() + ChatColor.AQUA + " joined silently");
@@ -415,8 +463,10 @@ public class PalCraftListener implements Listener {
 				}
 				vanish.setVanish(player, true);
 				player.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + "Joined silently");
+			} else {
+				evt.setJoinMessage(join(evt.getPlayer()));
 			}
-			
+
 		}
 		List<String> vanList = vanish.listOnlineVanished();
 		if (!player.hasPermission("PalCraftEssentials.command.vanish")) {
@@ -431,7 +481,7 @@ public class PalCraftListener implements Listener {
 			}
 		}
 	}
-	
+
 	@EventHandler
 	public void onEntityDamage(EntityDamageEvent evt) {
 		Entity e = evt.getEntity();
@@ -449,9 +499,9 @@ public class PalCraftListener implements Listener {
 			if (!s.equalsIgnoreCase(";"))
 				tempDeathStorage.put(player.getName().toLowerCase(), invToString(player.getInventory(), player.getName()));
 		}
-		
+
 	}
-	
+
 	@EventHandler
 	public void onEntityDamageByDamageEvent(EntityDamageByEntityEvent evt) {
 		Entity e = evt.getEntity();
@@ -473,8 +523,14 @@ public class PalCraftListener implements Listener {
 				evt.setCancelled(true);
 			}
 		}
+		if (e.getType() == EntityType.WITHER) {
+			e.remove();
+		}
+		if (evt.getDamager().getType() == EntityType.WITHER) {
+			evt.getDamager().remove();
+		}
 	}
-	
+
 	@EventHandler
 	public void onEntityTarget(EntityTargetEvent evt) {
 		if (evt.getTarget() instanceof Player) {
@@ -484,7 +540,7 @@ public class PalCraftListener implements Listener {
 			}
 		}
 	}
-	
+
 	@EventHandler
 	public void onPlayerMove(PlayerMoveEvent evt) {
 		Player player = evt.getPlayer();
@@ -509,7 +565,7 @@ public class PalCraftListener implements Listener {
 					player.teleport(back);
 				}
 			}
-			
+
 		}
 		if (player.isFlying()) {
 			int x = (int) player.getLocation().getX();
@@ -521,7 +577,7 @@ public class PalCraftListener implements Listener {
 			}
 		}
 	}
-	
+
 	@EventHandler
 	public void onPlayerQuit(PlayerQuitEvent evt) {
 		Player player = evt.getPlayer();
@@ -529,8 +585,8 @@ public class PalCraftListener implements Listener {
 		//play.remove(player.getName().toLowerCase());
 		//plugin.getConfig().set("playtime." + player.getName().toLowerCase(), plugin.getConfig().getLong("platime." + player.getName().toLowerCase()) + (System.currentTimeMillis() - l));
 		//plugin.saveConfig();
-		
-		updatePlaytime(player);
+
+		updatePlaytime(player, false);
 		online.remove(player.getName());
 		if (kick.containsKey(player.getName().toLowerCase())) {
 			kick.remove(player.getName().toLowerCase());
@@ -543,9 +599,11 @@ public class PalCraftListener implements Listener {
 					p.sendMessage(ChatColor.DARK_AQUA + player.getName() + " " + ChatColor.AQUA + " quit silently");
 				}
 			}
+		} else {
+			evt.setQuitMessage(quit(player));
 		}
 	}
-	
+
 	@EventHandler
 	public void onBlockBreak(BlockBreakEvent evt) {
 		Player player = evt.getPlayer();
@@ -581,7 +639,7 @@ public class PalCraftListener implements Listener {
 			i.setDurability((short) (i.getDurability() - 1));
 			player.setItemInHand(i);
 		}
-		
+
 	}
 	@EventHandler
 	public void onBlockPlace(BlockPlaceEvent evt) {
@@ -591,7 +649,7 @@ public class PalCraftListener implements Listener {
 			evt.setCancelled(true);
 		}
 	}
-	
+
 	@EventHandler
 	public void onPCPE(PlayerCommandPreprocessEvent evt) {
 		if (evt.getMessage().equalsIgnoreCase("superpick") || evt.getMessage().equalsIgnoreCase("//") || evt.getMessage().equals("/")) {
@@ -616,70 +674,70 @@ public class PalCraftListener implements Listener {
 					evt.setCancelled(true);
 				}
 			}
-			
+
 		}
-		
+
 	}
-	
-	
-	
+
+
+
 	public static String isBanned(OfflinePlayer player) {
 		String banreason = " ";
 		//Permanent ban
 		boolean banned = false;	
-		ResultSet rpl = MySQL.getRows(MySQL.con, "perma_bans");
-			try{
-				while(rpl.next()) {
-					if (player.getName().equalsIgnoreCase(rpl.getString("player"))) {
-						banreason = "Perma banned - " + rpl.getString("reason");
-						banned = true;
-					}
+		ResultSet rpl = MySQL.getRow(MySQL.con, "perma_bans", "player='" + player.getName() + "'");
+		
+		try{
+			while(rpl.next()) {
+				if (player.getName().equalsIgnoreCase(rpl.getString("player"))) {
+					banreason = ChatColor.GOLD + "You were banned by " + ChatColor.RED + rpl.getString("staff") + ChatColor.GOLD + "\nReason" + ChatColor.WHITE + ": " + ChatColor.RED + rpl.getString("reason") + ChatColor.GOLD + "\nAppeal at palcraft.com";
+					banned = true;
+					break;
 				}
-			} catch (Exception e) {
 			}
-			if (banned) {
-				return banreason;
-			}
-			if (isTempBanned(player)) {
-			long l = 1;
-			int id = -1;
-			boolean b = false;
-			String when = "";
-			ResultSet rtm = MySQL.getRows(MySQL.con, "temp_bans");
-			try{
-				while(rtm.next()) {
-					if (player.getName().equalsIgnoreCase(rtm.getString("player"))) {
-						banreason = rtm.getString("reason");
-						String[] s = rtm.getString("length").split(" ");
-						l = parseTimeSpec(s[0],s[1]);
-						id = rtm.getInt("id");
-						b = true;
-						when = rtm.getString("when");
-					}
-				}
-			} catch (Exception e) {
-			}
-			if (b){
-				long wh = Long.parseLong(when);
-				long tempTime = l;
-				long now = System.currentTimeMillis();
-				long diff = (tempTime + wh) - now;
+		} catch (Exception e) {
+		}
+		if (banned) {
+			return banreason;
+		}
+		long l = 1;
+		int id = -1;
+		boolean b = false;
+		String when = "";
+		String staff = "";
+		String length = "";
+		String reason = "";
+		
+		ResultSet rtm = MySQL.getRow(MySQL.con, "temp_bans", "player='" + player.getName() + "'");
+		try{
+			while(rtm.next()) {
 				
-				
-				if(diff <= 0){
-					MySQL.deleteRow(MySQL.con, "temp_bans", id, "player = '" + player.getName().toLowerCase() + "'");
-					banreason = " ";
-				}else{
-					banreason = "Temp banned - "+diff/1000/60+" mins: " + banreason;
+				if (player.getName().equalsIgnoreCase(rtm.getString("player"))) {
+					staff = rtm.getString("staff");
+					length = rtm.getString("length");
+					reason = rtm.getString("reason");
+					String[] s = rtm.getString("length").split(" ");
+					l = parseTimeSpec(s[0],s[1]);
+					id = rtm.getInt("id");
+					b = true;
+					when = rtm.getString("when");
+					break;
 				}
 			}
-			
-		} else {
-			
-			if (player.isBanned()) {
-				banreason = PalCommand.getConfig().getFC().getString("local.bans." + player.getName().toLowerCase());
+		} catch (Exception e) {}
+		if (b){
+			long wh = Long.parseLong(when);
+			long tempTime = l;
+			long now = System.currentTimeMillis();
+			long diff = (tempTime + wh) - now;
+
+
+			if(diff <= 0){
+				MySQL.deleteRow(MySQL.con, "temp_bans", id, "player = '" + player.getName().toLowerCase() + "'");
+				banreason = " ";
+			}else{
+				banreason = ChatColor.GOLD + "You were temp banned by " + ChatColor.RED + staff + ChatColor.GOLD+"\nLength" + ChatColor.WHITE + ": " + ChatColor.RED + length + ChatColor.GOLD + "\nReason" + ChatColor.WHITE + ": " + ChatColor.RED + reason + ChatColor.GOLD + "\nAppeal at palcraft.com\nWhen to come back" + ChatColor.WHITE + ": " + ChatColor.RED + (new SimpleDateFormat("dd/MM/yyyy hh:mm:ss").format(new Date(parseTimeSpec(length.split(" ")[0], length.split(" ")[1]) + Long.parseLong(when))));
 			}
-			
 		}
 		return banreason;
 	}
@@ -696,80 +754,17 @@ public class PalCraftListener implements Listener {
 		} else if (unit.startsWith("month")) {
 			ms = ms * (24 * 60 * 60 * 30);
 		}
-		
+
 		return ms;
-		
+
 		// 1000ms = 1 s
 		// 60000ms = 1 m
 		// 3600000ms = 1 hr
 		// 86400000ms = 1 day
 	}
-	
-	
-	public static boolean isTempBanned(OfflinePlayer player) {
-		boolean b = false;
-		ResultSet rtm = MySQL.getRows(MySQL.con, "temp_bans");
-		try{
-			while(rtm.next()) {
-				if (player.getName().equalsIgnoreCase(rtm.getString("player"))) {
-					b = true;
-				}
-			}
-		} catch (Exception e) {
-			
-		}
-		
-		return b;
-	}
-	
-	public String censorMessage(String message, Player player) {
-    	plugin.reloadConfig();
-    	List<String> cw = plugin.getConfig().getStringList("chat.blocked-words");
-    	String[] msg = message.split(" ");
-    	StringBuilder newmsg = new StringBuilder();
-    	StringBuilder usedwords = new StringBuilder();
-    	boolean app = false;
-    	boolean used = false;
-    	
-    	for (String m : msg) {
-    		app = false;
-    		for (String w : cw) {
-    			if (m.toLowerCase().contains(w)) {
-    				usedwords.append(w + ", ");
-    				char[] ms = m.toCharArray();
-    				StringBuilder newword = new StringBuilder();
-    				newword.append(ms[0]);
-    				int charLength = w.toCharArray().length;
-    				String newWord = String.valueOf(w.charAt(0));
-    				for (int i = 0; i < charLength - 1; i++) {
-    					newWord = newWord + "*";
-    				}
-    				newword.append(m.toLowerCase().replace(w, newWord));
-    				if (!app){
-    					newmsg.append(newword.toString() + " ");
-    					used=true;
-    					app=true;
-    				}
-    			}else{
-    				if (!app){
-    					newmsg.append(m + " ");
-    					app=true;
-    				}
-    			}
-    		}
-    	}
-    	
-    	if (used){
-    		player.sendMessage(ChatColor.RED + "You can't say: " + usedwords.toString());
-    		for (Player p : Bukkit.getServer().getOnlinePlayers()){
-    			if (p.hasPermission("PalCraftEssentials.blocked-words.view")){
-    				p.sendMessage(ChatColor.GOLD + "[PalCraftEssentials] " + player.getName() + " tried to say: " + ChatColor.YELLOW + usedwords.toString());
-    			}
-    		}
-    	}
-    	return newmsg.toString();
-    }
-	
+
+
+
 	public static String invToString(Inventory inv, String pname) {
 		String rs = ";";
 		for (ItemStack i : inv.getContents()) {
@@ -790,15 +785,65 @@ public class PalCraftListener implements Listener {
 	public static String getRandomPlayer() {
 		return Bukkit.getOnlinePlayers()[new Random().nextInt(Bukkit.getOnlinePlayers().length - 1)].getDisplayName();
 	}
-	public static void updatePlaytime(Player player) {
-		CustomConfig conf = PalCommand.getConfig(player);
-		long l = play.get(player.getName().toLowerCase());
-		long pl = System.currentTimeMillis() - l;
-		long oldPlay = conf.getFC().getLong("playtime");
-		long newPlay = oldPlay + pl;
-		conf.getFC().set("playtime", newPlay);
-		conf.save();
-		play.remove(player.getName().toLowerCase());
-		play.put(player.getName().toLowerCase(), System.currentTimeMillis());
+	public static void updatePlaytime(Player player, boolean b) {
+		CustomConfig conf = PalCommand.getConfig(player.getName().toLowerCase());
+		if (play.containsKey(player.getName().toLowerCase())) {
+			long l = play.get(player.getName().toLowerCase());
+			long pl = System.currentTimeMillis() - l;
+			long oldPlay = conf.getFC().getLong("playtime");
+			long newPlay = oldPlay + pl;
+			conf.getFC().set("playtime", newPlay);
+			conf.save();
+			play.remove(player.getName().toLowerCase());
+		}
+
+		if (b) {
+			play.put(player.getName().toLowerCase(), System.currentTimeMillis());
+		}
+
+	}
+
+	public boolean isBlockedToPush(Block block) {
+		List<Integer> il = PalCommand.getConfig().getFC().getIntegerList("blocked-piston-push");
+		boolean b = false;
+		for (int i : il) {
+			if (block.getTypeId() == i) {
+				b = true;
+			}
+		}
+		return b;
+	}
+
+	public static String join(Player player) {
+		if (Bukkit.getPluginManager().isPluginEnabled("DaveChat")) {
+			try{
+				String jM = DaveListener.getJoinMessageForPlayer(player);
+				if (jM.equalsIgnoreCase("")) {
+					jM = ChatColor.YELLOW + player.getName() + " joined the game";
+				}
+				return jM;
+			} catch (Exception e) {
+				e.printStackTrace();
+				return ChatColor.YELLOW + player.getName() + " joined the game";
+			}
+		}
+		return ChatColor.YELLOW + player.getName() + " joined the game";
+
+
+	}
+	public static String quit(Player player) {
+		if (Bukkit.getPluginManager().isPluginEnabled("DaveChat")) {
+			try{
+				String jM = DaveListener.getQuitMessageForPlayer(player);
+				if (jM.equalsIgnoreCase("")) {
+					jM = ChatColor.YELLOW + player.getName() + " left the game";
+				}
+				return jM;
+			} catch (Exception e) { 
+				e.printStackTrace();
+				return ChatColor.YELLOW + player.getName() + " left the game";
+			}
+		}
+		return ChatColor.YELLOW + player.getName() + " left the game";
 	}
 }

@@ -2,7 +2,6 @@ package me.davejavu.pce.command;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -26,9 +25,8 @@ public class tpdeny extends PalCommand {
 				if (permissionCheck(sender, "PalCraftEssentials.command.tpdeny")) {
 					if (PalCraftEssentials.tpa.containsKey(((Player)sender).getName().toLowerCase())) {
 						String tpTo = PalCraftEssentials.tpa.get(((Player)sender).getName().toLowerCase());
-						OfflinePlayer opl = Bukkit.getOfflinePlayer(tpTo);
-						if (opl.isOnline()) {
-							Player pl = opl.getPlayer();
+						if (Bukkit.getPlayer(tpTo) != null) {
+							Player pl = getPlayer(tpTo);
 							sendMessage(sender, ChatColor.RED + "Denied " + ChatColor.GOLD + "teleport request from " + ChatColor.WHITE + pl.getDisplayName());
 							pl.sendMessage(ChatColor.WHITE + ((Player)sender).getDisplayName() + ChatColor.RED + " denied " + ChatColor.GOLD + "your teleport request");
 							PalCraftEssentials.tpa.remove(((Player)sender).getName().toLowerCase());

@@ -24,7 +24,7 @@ public class me extends PalCommand {
 		if (cmd.getName().equalsIgnoreCase("me")) {
 			if (sender instanceof Player) {
 				Player player = (Player) sender;
-				if (!PalCraftListener.gag.contains(player) && !mute.isMuted(player)) {
+				if (!PalCraftListener.gag.contains(player.getName()) && !mute.isMuted(player)) {
 					if (args.length > 0) {
 						StringBuilder msg = new StringBuilder();
 						for (String a : args) {

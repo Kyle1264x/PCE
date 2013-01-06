@@ -2,6 +2,7 @@ package me.davejavu.pce;
 
 import java.io.File;
 import java.io.InputStream;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -34,6 +35,7 @@ public class PalCraftEssentials extends JavaPlugin implements Listener {
 	//(this)
 	static Plugin plugin;
 	
+	int taskId;
 	
 	//MySQL info
 	public static String host = PalCommand.getConfig().getFC().getString("mysql.host");
@@ -51,6 +53,9 @@ public class PalCraftEssentials extends JavaPlugin implements Listener {
 	
 	
 	public void onEnable() {
+		
+		
+		
 		//Taking the time at the start of startup - enables us to
 		//see how long overall startup took by taking the start time
 		//away from the end time.
@@ -68,12 +73,9 @@ public class PalCraftEssentials extends JavaPlugin implements Listener {
 			}
 			
 		}
+		//Backup.setup(this);
 		//Sets the chat listener depending on the version of bukkit being used.
-		if (Bukkit.getBukkitVersion().startsWith("1.2.5")) {
-			getServer().getPluginManager().registerEvents(new PalCraftOldChatListener(this), this);
-		} else {
-			getServer().getPluginManager().registerEvents(new PalCraftAsyncListener(this), this);
-		}
+		getServer().getPluginManager().registerEvents(new PalCraftAsyncListener(this), this);
 		getServer().getPluginManager().registerEvents(new PalCraftListener(this), this);
 		//In case of reload add all online players to the online list
 		for (Player p : getServer().getOnlinePlayers()) {
@@ -88,10 +90,26 @@ public class PalCraftEssentials extends JavaPlugin implements Listener {
 			getServer().getPluginManager().disablePlugin(this);
 		}
 		new MySQL(host, port, database, username, password);
+		try{
+			createTables();
+			log.info("[PalCraftEssentials] Tables created in database!");
+		} catch (SQLException e) {
+			log.log(Level.SEVERE, "[PalCraftEssentials] Tables could not be created, posting error...");
+			e.printStackTrace();
+		}
+		//taskId = getServer().getScheduler().scheduleAsyncRepeatingTask(this, new Runnable() {
+
+		//	@Override
+		//	public void run() {
+		//		backup.backupDats();
+		//	}
+			
+		//}, (60 * 20) * 30L, (60 * 20) * 30L);
 		log.info("[PalCraftEssentials] Startup finished! Took " + (System.currentTimeMillis() - firstTime) + " ms");
 	}
 	
 	public void onDisable() {
+		//getServer().getScheduler().cancelTask(taskId);
 		try {
 			//Close connection.
 			MySQL.con.close();
@@ -202,4 +220,25 @@ public class PalCraftEssentials extends JavaPlugin implements Listener {
 		YamlConfiguration yc = YamlConfiguration.loadConfiguration(is);
 		return yc;
 	}
+	public void createTables() throws SQLException {
+		ResultSet res = MySQL.con.getMetaData().getTables(null, null, null, new String[] {"TABLE"});
+		boolean needToCreateTables = true;
+		while (res.next()) {
+			if (res.getString("TABLE_NAME").equalsIgnoreCase("perma_bans")) {
+				needToCreateTables = false;
+			}
+		}
+		String[] tables = {"perma_bans;id INT, player TEXT, reason TEXT, staff TEXT, date TEXT","ip_bans;id INT, ip TEXT, staff TEXT","temp_bans;id INT, player TEXT, length TEXT, staff TEXT, reason TEXT, `when` BIGINT, `date` TEXT","player_info;player TEXT, warnings TEXT, kicks TEXT, bans TEXT"};
+		if (needToCreateTables) {
+			for (String s : tables) {
+				String tName = s.split(";")[0];
+				String values = s.split(";")[1];
+				MySQL.createTable(MySQL.con, tName, values);
+			}
+		} else {
+			log.info("[PalCraftEssentials] Tables already created");
+		}
+	}
 }
+
+

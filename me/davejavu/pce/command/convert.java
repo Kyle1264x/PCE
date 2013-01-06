@@ -33,7 +33,7 @@ public class convert extends PalCommand {
 		if (cmd.getName().equalsIgnoreCase("convert")) {
 			if (permissionCheck(sender, "command.convert")) {
 				if (args.length == 1) {
-					ResultSet r = MySQL.getRows(MySQL.con, "perma_bans");
+					ResultSet r = MySQL.getAllRows(MySQL.con, "perma_bans");
 					if (args[0].equalsIgnoreCase("from")) {
 						try {
 							while (r.next()) {

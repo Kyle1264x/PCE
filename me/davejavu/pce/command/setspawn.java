@@ -5,8 +5,10 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 
+import me.davejavu.pce.CustomConfig;
 import me.davejavu.pce.PalCommand;
 
 public class setspawn extends PalCommand {
@@ -17,8 +19,17 @@ public class setspawn extends PalCommand {
 		if (cmd.getName().equalsIgnoreCase("setspawn")) {
 			if (permissionCheck(sender, "PalCraftEssentials.command.setspawn")) {
 				if (sender instanceof Player) {
-					Location newSpawnLoc = ((Player)sender).getLocation();
-					Bukkit.getWorlds().get(0).setSpawnLocation(newSpawnLoc.getBlockX(), newSpawnLoc.getBlockY(),newSpawnLoc.getBlockZ());
+					Location nSL = ((Player)sender).getLocation();
+					CustomConfig conf = getConfig();
+					FileConfiguration fc = conf.getFC();
+					fc.set("spawn.x", nSL.getX());
+					fc.set("spawn.y", nSL.getY());
+					fc.set("spawn.z", nSL.getZ());
+					fc.set("spawn.world", nSL.getWorld().getName());
+					fc.set("spawn.pitch", nSL.getPitch());
+					fc.set("spawn.yaw", nSL.getYaw());
+					conf.save(fc);
+					Bukkit.getWorlds().get(0).setSpawnLocation(nSL.getBlockX(), nSL.getBlockY(),nSL.getBlockZ());
 					sendMessage(sender, ChatColor.GOLD + "Set spawn location");
 					return true;
 				} else {
