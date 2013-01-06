@@ -749,9 +749,9 @@ public class PalCraftListener implements Listener {
 			ms = ms * 60;
 		} else if (unit.startsWith("hour")) {
 			ms = (ms * 60) * 60;
-		} else if (unit.startsWith("day")) {
+		} else if (unit.startsWith("day" || "days")) {
 			ms = ms * (24 * 60 * 60);
-		} else if (unit.startsWith("month")) {
+		} else if (unit.startsWith("month" || "months")) {
 			ms = ms * (24 * 60 * 60 * 30);
 		}
 
