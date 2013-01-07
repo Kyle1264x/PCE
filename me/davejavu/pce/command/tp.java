@@ -40,7 +40,18 @@ public class tp extends PalCommand {
 						
 						sendMessage(sender, ChatColor.GOLD + "Teleported to " + ChatColor.WHITE + p2.getDisplayName());
 						return true;
-					} else if (args.length == 2) {
+					} else if(args.length == 3) {
+						try{
+						Double.parseDouble(args[0]);
+ 						} catch (Exception e) {
+  						sendMessage(sender, ChatColor.RED + (" One or more of your arguments' isnt a number! ");
+  						return true;
+						} 
+						Location location = new Location(player.getWorld(), Double.parseDouble(args[0]), Double.parseDouble(args[1]),  Double.parseDouble(args[2]);
+						player.teleport(location);
+						return true;
+					
+					}else if (args.length == 2) {
 						Player p2 = getPlayer(args[0]);
 						if (p2 == null) {
 							sendMessage(sender, ChatColor.RED + "'" + args[0] + "' is not online!");
